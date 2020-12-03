@@ -19,7 +19,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.example.application.views.main.MainView;
 
-@Route(value = "employee", layout = MainView.class)
 @PageTitle("Employee")
 @CssImport(value = "./styles/views/employee/employee-view.css", include = "lumo-badge")
 @JsModule("@vaadin/vaadin-lumo-styles/badge.js")

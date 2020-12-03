@@ -29,7 +29,6 @@ import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.textfield.TextField;
 
-@Route(value = "admin", layout = MainView.class)
 @PageTitle("Admin")
 @CssImport("./styles/views/admin/admin-view.css")
 public class AdminView extends Div {
