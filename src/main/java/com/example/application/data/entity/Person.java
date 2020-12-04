@@ -1,6 +1,6 @@
 package com.example.application.data.entity;
 
-import javax.persistence.Entity;
+import javax.persistence.*;
 
 import com.example.application.data.AbstractEntity;
 import java.time.LocalDate;
@@ -12,9 +12,12 @@ public class Person extends AbstractEntity {
     private String lastName;
     private String email;
     private String phone;
+    private int pesel;
     private LocalDate dateOfBirth;
-    private String occupation;
-    private boolean important;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private User user;
 
     public String getFirstName() {
         return firstName;
@@ -46,17 +49,14 @@ public class Person extends AbstractEntity {
     public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
-    public String getOccupation() {
-        return occupation;
-    }
-    public void setOccupation(String occupation) {
-        this.occupation = occupation;
-    }
-    public boolean isImportant() {
-        return important;
-    }
-    public void setImportant(boolean important) {
-        this.important = important;
+    public int getPesel() { return pesel; }
+    public void setPesel(int pesel) { this.pesel = pesel; }
+
+    public User getUser() {
+        return user;
     }
 
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

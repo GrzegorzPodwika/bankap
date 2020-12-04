@@ -2,14 +2,20 @@ package com.example.application.views.main;
 
 import java.util.Optional;
 
+import com.example.application.data.entity.User;
+import com.example.application.data.service.AuthService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -17,12 +23,13 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
 import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.PWA;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.Theme;
 import com.example.application.views.main.MainView;
 import com.example.application.views.login.LoginView;
-import com.example.application.views.signup.SignUpView;
 import com.example.application.views.home.HomeView;
 import com.example.application.views.admin.AdminView;
 import com.example.application.views.employee.EmployeeView;
@@ -39,8 +46,10 @@ public class MainView extends AppLayout {
 
     private final Tabs menu;
     private H1 viewTitle;
+    private final AuthService authService;
 
-    public MainView() {
+    public MainView(AuthService authService) {
+        this.authService = authService;
         setPrimarySection(Section.DRAWER);
         addToNavbar(true, createHeaderContent());
         menu = createMenu();
@@ -57,8 +66,27 @@ public class MainView extends AppLayout {
         layout.add(new DrawerToggle());
         viewTitle = new H1();
         layout.add(viewTitle);
-        layout.add(new Image("images/user.svg", "Avatar"));
+
+        Image avatar = new Image("images/user.svg", "Avatar");
+
+        ContextMenu contextMenu = new ContextMenu(avatar);
+        contextMenu.setOpenOnClick(true);
+        contextMenu.addItem("Settings",
+                e -> Notification.show("Not implemented yet.", 3000,
+                        Notification.Position.BOTTOM_CENTER));
+        contextMenu.addItem("Log Out",
+                e -> {
+                    logout();
+                });
+
+        layout.add(avatar);
         return layout;
+    }
+
+    private void logout() {
+        UI.getCurrent().getPage().setLocation("login");
+        VaadinSession.getCurrent().getSession().invalidate();
+        VaadinSession.getCurrent().close();
     }
 
     private Component createDrawerContent(Tabs menu) {
@@ -87,10 +115,10 @@ public class MainView extends AppLayout {
     }
 
     private Component[] createMenuItems() {
-        return new Tab[]{createTab("Login", LoginView.class), createTab("SignUp", SignUpView.class),
-                createTab("Home", HomeView.class), createTab("Admin", AdminView.class),
-                createTab("Employee", EmployeeView.class), createTab("Payments", PaymentsView.class),
-                createTab("Cards", CardsView.class)};
+        User user = VaadinSession.getCurrent().getAttribute(User.class);
+        return authService.getAuthorizedRoutes(user.getRole()).stream()
+                .map(r -> createTab(r.getName(), r.getView()))
+                .toArray(Component[]::new);
     }
 
     private static Tab createTab(String text, Class<? extends Component> navigationTarget) {

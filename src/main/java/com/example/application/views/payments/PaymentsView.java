@@ -3,7 +3,6 @@ package com.example.application.views.payments;
 import java.util.Optional;
 
 import com.example.application.data.entity.Address;
-import com.example.application.data.service.AddressService;
 import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.button.Button;
@@ -21,7 +20,6 @@ import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.artur.helpers.CrudServiceDataProvider;
 import com.example.application.views.main.MainView;
 import com.vaadin.flow.component.textfield.TextField;
@@ -46,7 +44,7 @@ public class PaymentsView extends Div {
 
     private Address address;
 
-    public PaymentsView(@Autowired AddressService addressService) {
+    public PaymentsView() {
         setId("payments-view");
         // Create UI
         SplitLayout splitLayout = new SplitLayout();
@@ -57,7 +55,7 @@ public class PaymentsView extends Div {
 
         add(splitLayout);
 
-        // Configure Grid
+/*        // Configure Grid
         grid.addColumn("street").setAutoWidth(true);
         grid.addColumn("postalCode").setAutoWidth(true);
         grid.addColumn("city").setAutoWidth(true);
@@ -107,7 +105,7 @@ public class PaymentsView extends Div {
             } catch (ValidationException validationException) {
                 Notification.show("An exception happened while trying to store the address details.");
             }
-        });
+        });*/
 
     }
 

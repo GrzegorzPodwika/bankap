@@ -1,9 +1,6 @@
 package com.example.application.views.admin;
 
-import java.util.Optional;
-
 import com.example.application.data.entity.Person;
-import com.example.application.data.service.PersonService;
 import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.button.Button;
@@ -11,21 +8,13 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
-import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.vaadin.artur.helpers.CrudServiceDataProvider;
-import com.example.application.views.main.MainView;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.textfield.TextField;
 
@@ -50,7 +39,7 @@ public class AdminView extends Div {
 
     private Person person;
 
-    public AdminView(@Autowired PersonService personService) {
+    public AdminView() {
         setId("admin-view");
         // Create UI
         SplitLayout splitLayout = new SplitLayout();
@@ -61,7 +50,7 @@ public class AdminView extends Div {
 
         add(splitLayout);
 
-        // Configure Grid
+/*        // Configure Grid
         grid.addColumn("firstName").setAutoWidth(true);
         grid.addColumn("lastName").setAutoWidth(true);
         grid.addColumn("email").setAutoWidth(true);
@@ -117,7 +106,7 @@ public class AdminView extends Div {
             } catch (ValidationException validationException) {
                 Notification.show("An exception happened while trying to store the person details.");
             }
-        });
+        });*/
 
     }
 

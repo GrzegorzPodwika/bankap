@@ -1,13 +1,10 @@
-#login-view {
+#register-view {
     display: grid;
     padding: 30%;
+    alignment: center;
 }
 
 :host {
     display: block;
     padding: var(--lumo-space-m) var(--lumo-space-l);
-}
-
-#login-view-password {
-    margin-bottom: 20px;
 }
