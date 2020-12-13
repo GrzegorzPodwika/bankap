@@ -93,4 +93,5 @@ public class AuthService {
         userRepository.save(new User(username, password, Role.USER));
     }
 
+
 }
