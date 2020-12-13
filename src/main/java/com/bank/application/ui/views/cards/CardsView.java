@@ -48,10 +48,11 @@ public class CardsView extends Div {
         SplitLayout splitLayout = new SplitLayout();
         splitLayout.setSizeFull();
 
-        createGridLayout(splitLayout);
-        createEditorLayout(splitLayout);
+        //createGridLayout(splitLayout);
+        //createEditorLayout(splitLayout);
 
         add(splitLayout);
+    }
 
 /*        // Configure Grid
         grid.addColumn("firstName").setAutoWidth(true);
@@ -109,7 +110,7 @@ public class CardsView extends Div {
             } catch (ValidationException validationException) {
                 Notification.show("An exception happened while trying to store the person details.");
             }
-        });*/
+        });
 
     }
 
@@ -174,5 +175,5 @@ public class CardsView extends Div {
     private void populateForm(Person value) {
         this.person = value;
         binder.readBean(this.person);
-    }
+    }*/
 }

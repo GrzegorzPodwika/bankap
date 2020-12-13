@@ -44,10 +44,11 @@ public class PaymentsView extends Div {
         SplitLayout splitLayout = new SplitLayout();
         splitLayout.setSizeFull();
 
-        createGridLayout(splitLayout);
-        createEditorLayout(splitLayout);
+        //createGridLayout(splitLayout);
+        //createEditorLayout(splitLayout);
 
         add(splitLayout);
+    }
 
 /*        // Configure Grid
         grid.addColumn("street").setAutoWidth(true);
@@ -99,7 +100,7 @@ public class PaymentsView extends Div {
             } catch (ValidationException validationException) {
                 Notification.show("An exception happened while trying to store the address details.");
             }
-        });*/
+        });
 
     }
 
@@ -160,5 +161,5 @@ public class PaymentsView extends Div {
     private void populateForm(Address value) {
         this.address = value;
         binder.readBean(this.address);
-    }
+    }*/
 }

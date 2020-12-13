@@ -18,9 +18,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import java.time.LocalDate;
-import java.util.Arrays;
-
 @Route("register")
 @PageTitle("Register | BankAP")
 @CssImport("./styles/views/register/register-view.css")
@@ -38,13 +35,13 @@ public class RegisterView extends Composite {
         PasswordField confirmPassword = new PasswordField("Confirm Password");
         TextField firstName = new TextField("First Name");
         TextField lastName = new TextField("Last Name");
-        EmailField emailField = createEmail();
-        TextField phone = createPhone();
-        TextField id = createID();
-        TextField homeAddress = new TextField("Home Address");
-        homeAddress.setPlaceholder("Home Address");
+        TextField pesel = createPesel();
+        TextField address = new TextField("Address");
+        address.setPlaceholder("Home Address");
         DatePicker dateOfBirth = new DatePicker();
         dateOfBirth.setLabel("Date of Birth");
+        EmailField emailField = createEmail();
+        TextField phone = createPhone();
 
         FormLayout formLayout = new FormLayout(
                 username,
@@ -52,8 +49,8 @@ public class RegisterView extends Composite {
                 confirmPassword,
                 firstName,
                 lastName,
-                id,
-                homeAddress,
+                pesel,
+                address,
                 dateOfBirth,
                 emailField,
                 phone
@@ -72,11 +69,10 @@ public class RegisterView extends Composite {
                         confirmPassword.getValue(),
                         firstName.getValue(),
                         lastName.getValue(),
+                        pesel.getValue(),
+                        address.getValue(),
                         emailField.getValue(),
-                        phone.getValue(),
-                        id.getValue(),
-                        dateOfBirth.getValue(),
-                        homeAddress.getValue()
+                        phone.getValue()
                 )));
 
         verticalLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
@@ -85,7 +81,7 @@ public class RegisterView extends Composite {
     }
 
     private void register(String username, String password, String confirmPassword, String firstName, String lastName,
-                          String email, String phone, String personId, LocalDate dateOfBirth, String home) {
+                          String pesel, String address, String email, String phone) {
 
         if (username.trim().isEmpty()) {
             Notification.show("Enter a username");
@@ -94,7 +90,7 @@ public class RegisterView extends Composite {
         } else if(!password.equals(confirmPassword)) {
             Notification.show("Passwords don't match!");
         } else {
-            authService.register(username, password);
+            authService.register(username, password, firstName, lastName, pesel, address, email, phone);
             Notification.show("Registration succeeded.");
             try {
                 Thread.sleep(1000);
@@ -123,7 +119,7 @@ public class RegisterView extends Composite {
         return phone;
     }
 
-    private TextField createID() {
+    private TextField createPesel() {
         TextField id = new TextField("ID");
         id.setPattern("[0-9]*");
         id.setPreventInvalidInput(true);

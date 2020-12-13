@@ -15,12 +15,13 @@ import com.vaadin.flow.server.VaadinSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class AuthService {
+
+    private VaadinSession session;
 
     public static class AuthorizedRoute {
         private final String route;
@@ -89,9 +90,10 @@ public class AuthService {
         return routes;
     }
 
-    public void register(String username, String password) {
-        userRepository.save(new User(username, password, Role.USER));
+    public void register(String username, String password, String firstName, String lastName,
+                         String pesel, String address, String email, String phone) {
+        userRepository.save(new User(username, password, Role.USER, firstName, lastName, pesel, address, email, phone));
     }
 
-
+    public String getCurrentUserName() { return VaadinSession.getCurrent().getAttribute(User.class).getUsername(); }
 }

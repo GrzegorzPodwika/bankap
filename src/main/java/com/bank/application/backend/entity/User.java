@@ -3,35 +3,31 @@ package com.bank.application.backend.entity;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToOne;
-import java.time.LocalDate;
 
 @Entity
-public class User extends AbstractEntity {
+public class User extends Person {
 
     private String username;
     private String passwordSalt;
     private String passwordHash;
     private Role role;
 
-    @OneToOne(
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            mappedBy = "user"
-    )
-    private Person person;
-
     public User() {
     }
 
-    public User(String username, String plainPassword, Role role) {
+    public User(String username, String plainPassword, Role role, String firstName, String lastName,
+                String pesel, String address, String email, String phone) {
         this.username = username;
         this.role = role;
         this.passwordSalt = RandomStringUtils.random(32);
         this.passwordHash = DigestUtils.sha1Hex(plainPassword + passwordSalt);
+        this.setFirstName(firstName);
+        this.setLastName(lastName);
+        this.setPesel(pesel);
+        this.setAddress(address);
+        this.setEmail(email);
+        this.setPhone(phone);
     }
 
     public boolean checkPassword(String plainPassword) {
@@ -70,11 +66,4 @@ public class User extends AbstractEntity {
         this.role = role;
     }
 
-    public Person getPerson() {
-        return person;
-    }
-
-    public void setPerson(Person person) {
-        this.person = person;
-    }
 }
