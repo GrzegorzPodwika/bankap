@@ -1,12 +1,19 @@
 package com.bank.application.backend.entity;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
-public class Transaction extends Person {
+public class Transaction extends ItemClass {
 
     private String date;
     private int amount;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public Transaction(String date, int amount) {
         this.date = date;

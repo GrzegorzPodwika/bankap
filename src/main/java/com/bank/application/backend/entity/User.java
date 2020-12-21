@@ -3,7 +3,8 @@ package com.bank.application.backend.entity;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 
-import javax.persistence.Entity;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class User extends Person {
@@ -12,6 +13,15 @@ public class User extends Person {
     private String passwordSalt;
     private String passwordHash;
     private Role role;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private List<CreditCard> creditCardList;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private List<Transaction> transactionList;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private List<Submission> submissionList;
 
     public User() {
     }
