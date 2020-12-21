@@ -124,8 +124,8 @@ public class AdminView extends Div {
         email = new TextField("Email");
         phone = new TextField("Phone");
         dateOfBirth = new DatePicker("Date Of Birth");
-        occupation = new TextField("Occupation");
-        important = new Checkbox("Important");
+        occupation = new TextField("Address");
+        important = new Checkbox("Employee");
         important.getStyle().set("padding-top", "var(--lumo-space-m)");
         AbstractField<?, ?>[] fields = new AbstractField<?, ?>[]{firstName, lastName, email, phone, dateOfBirth,
                 occupation, important};
