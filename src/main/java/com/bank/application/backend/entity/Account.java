@@ -3,13 +3,24 @@ package com.bank.application.backend.entity;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 
-import javax.persistence.Entity;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
-public class Account extends Person {
+public class Account extends ItemClass {
 
     private String accountNumber;
     private String accountBalance;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
+    private List<Credit> creditList;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
+    private List<CreditCard> creditCardList;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public Account(String accountNumber) {
         this.accountBalance = "0";

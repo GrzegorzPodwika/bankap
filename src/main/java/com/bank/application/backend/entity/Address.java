@@ -3,7 +3,7 @@ package com.bank.application.backend.entity;
 import javax.persistence.Entity;
 
 @Entity
-public class Address extends Person {
+public class Address extends ItemClass {
 
     private String street;
     private String postalCode;

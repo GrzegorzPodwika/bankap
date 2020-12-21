@@ -1,14 +1,22 @@
 package com.bank.application.backend.entity;
 
-import javax.persistence.Entity;
+import javax.persistence.*;
 
 @Entity
-public class Credit extends Person {
+public class Credit extends ItemClass {
 
     private String begin;
     private String end;
     private int amount;
     private int numberOfInstallments;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id")
+    private Account account;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "submission_id")
+    private Submission submission;
 
     public Credit(String begin, String end, int amount, int numberOfInstallments) {
         this.begin = begin;
