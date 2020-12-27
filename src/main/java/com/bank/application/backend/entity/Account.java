@@ -1,8 +1,5 @@
 package com.bank.application.backend.entity;
 
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.RandomStringUtils;
-
 import javax.persistence.*;
 import java.util.List;
 
@@ -17,10 +14,6 @@ public class Account extends ItemClass {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
     private List<CreditCard> creditCardList;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
 
     public Account(String accountNumber) {
         this.accountBalance = "0";
@@ -41,5 +34,21 @@ public class Account extends ItemClass {
 
     public void setAccountNumber(String accountNumber) {
         this.accountNumber = accountNumber;
+    }
+
+    public List<Credit> getCreditList() {
+        return creditList;
+    }
+
+    public void setCreditList(List<Credit> creditList) {
+        this.creditList = creditList;
+    }
+
+    public List<CreditCard> getCreditCardList() {
+        return creditCardList;
+    }
+
+    public void setCreditCardList(List<CreditCard> creditCardList) {
+        this.creditCardList = creditCardList;
     }
 }

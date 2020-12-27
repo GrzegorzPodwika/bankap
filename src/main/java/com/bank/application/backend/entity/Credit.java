@@ -25,27 +25,50 @@ public class Credit extends ItemClass {
         this.numberOfInstallments = numberOfInstallments;
     }
 
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
+    }
+
+    public Submission getSubmission() {
+        return submission;
+    }
+
+    public void setSubmission(Submission submission) {
+        this.submission = submission;
+    }
+
     public String getBegin() {
         return begin;
     }
+
     public void setBegin(String begin) {
         this.begin = begin;
     }
+
     public String getEnd() {
         return end;
     }
+
     public void setEnd(String end) {
         this.end = end;
     }
+
     public int getAmount() {
         return this.amount;
     }
+
     public void setAmount(int amount) {
         this.amount = amount;
     }
+
     public int getNumberOfInstallments() {
         return numberOfInstallments;
     }
+
     public void setNumberOfInstallments(int numberOfInstallments) {
         this.numberOfInstallments = numberOfInstallments;
     }

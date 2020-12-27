@@ -21,35 +21,8 @@ import java.util.List;
 @Service
 public class AuthService {
 
-    private VaadinSession session;
-
-    public static class AuthorizedRoute {
-        private final String route;
-        private final String name;
-        private final Class<? extends Component> view;
-
-        public AuthorizedRoute(String route, String name, Class<? extends Component> view) {
-            this.route = route;
-            this.name = name;
-            this.view = view;
-        }
-
-        public String getRoute() {
-            return route;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public Class<? extends Component> getView() {
-            return view;
-        }
-    }
-
-    public static class AuthException extends Exception { }
-
     private final UserRepository userRepository;
+    private VaadinSession session;
 
     public AuthService(@Autowired UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -78,10 +51,10 @@ public class AuthService {
             routes.add(new AuthorizedRoute("home", "Home", HomeView.class));
             routes.add(new AuthorizedRoute("payments", "Payments", PaymentsView.class));
             routes.add(new AuthorizedRoute("cards", "Cards", CardsView.class));
-        } else if(role == Role.EMPLOYEE) {
+        } else if (role == Role.EMPLOYEE) {
             routes.add(new AuthorizedRoute("home", "Home", HomeView.class));
             routes.add(new AuthorizedRoute("employee", "Employee", EmployeeView.class));
-        } else if(role == Role.ADMIN) {
+        } else if (role == Role.ADMIN) {
             routes.add(new AuthorizedRoute("home", "Home", HomeView.class));
             routes.add(new AuthorizedRoute("admin", "Admin", AdminView.class));
 
@@ -95,5 +68,34 @@ public class AuthService {
         userRepository.save(new User(username, password, Role.USER, firstName, lastName, pesel, address, email, phone));
     }
 
-    public String getCurrentUserName() { return VaadinSession.getCurrent().getAttribute(User.class).getUsername(); }
+    public String getCurrentUserName() {
+        return VaadinSession.getCurrent().getAttribute(User.class).getUsername();
+    }
+
+    public static class AuthorizedRoute {
+        private final String route;
+        private final String name;
+        private final Class<? extends Component> view;
+
+        public AuthorizedRoute(String route, String name, Class<? extends Component> view) {
+            this.route = route;
+            this.name = name;
+            this.view = view;
+        }
+
+        public String getRoute() {
+            return route;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Class<? extends Component> getView() {
+            return view;
+        }
+    }
+
+    public static class AuthException extends Exception {
+    }
 }
