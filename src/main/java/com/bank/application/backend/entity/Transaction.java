@@ -20,15 +20,26 @@ public class Transaction extends ItemClass {
         this.amount = amount;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     public String getDate() {
         return date;
     }
+
     public void setDate(String date) {
         this.date = date;
     }
+
     public int getAmount() {
         return this.amount;
     }
+
     public void setAmount(int amount) {
         this.amount = amount;
     }

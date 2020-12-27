@@ -13,15 +13,15 @@ public class User extends Person {
     private String passwordSalt;
     private String passwordHash;
     private Role role;
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<CreditCard> creditCardList;
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<Transaction> transactionList;
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<Submission> submissionList;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id")
+    private Account account;
 
     public User() {
     }
@@ -38,6 +38,53 @@ public class User extends Person {
         this.setAddress(address);
         this.setEmail(email);
         this.setPhone(phone);
+
+        account = new Account(generateRandomAccountNumber());
+    }
+
+    public String generateRandomAccountNumber() {
+        int min = 0;
+        int max = 9;
+        String accountNumber = "";
+
+        for (int i = 0; i < 26; i++) {
+            int randomNum = (int)(Math.random() * (max - min + 1) + min);
+            accountNumber += Integer.toString(randomNum);
+        }
+
+        return accountNumber;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
+    }
+
+    public List<CreditCard> getCreditCardList() {
+        return creditCardList;
+    }
+
+    public void setCreditCardList(List<CreditCard> creditCardList) {
+        this.creditCardList = creditCardList;
+    }
+
+    public List<Transaction> getTransactionList() {
+        return transactionList;
+    }
+
+    public void setTransactionList(List<Transaction> transactionList) {
+        this.transactionList = transactionList;
+    }
+
+    public List<Submission> getSubmissionList() {
+        return submissionList;
+    }
+
+    public void setSubmissionList(List<Submission> submissionList) {
+        this.submissionList = submissionList;
     }
 
     public boolean checkPassword(String plainPassword) {

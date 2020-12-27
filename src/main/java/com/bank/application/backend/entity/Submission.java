@@ -9,7 +9,6 @@ import javax.persistence.ManyToOne;
 public class Submission extends ItemClass {
 
     private String date;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -18,9 +17,18 @@ public class Submission extends ItemClass {
         this.date = date;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     public String getDate() {
         return date;
     }
+
     public void setDate(String date) {
         this.date = date;
     }

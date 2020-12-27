@@ -1,15 +1,9 @@
 package com.bank.application.ui.views.payments;
 
-import com.bank.application.backend.entity.Address;
-import com.vaadin.flow.component.AbstractField;
-import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.router.PageTitle;
@@ -17,13 +11,14 @@ import com.vaadin.flow.router.Route;
 
 import com.bank.application.ui.views.main.MainView;
 import com.vaadin.flow.component.textfield.TextField;
+import org.apache.tomcat.jni.Address;
 
 @Route(value = "payments", layout = MainView.class)
 @PageTitle("Payments")
 @CssImport("./styles/views/payments/payments-view.css")
 public class PaymentsView extends Div {
 
-    private Grid<Address> grid = new Grid<>(Address.class, false);
+    //private Grid<Address> grid = new Grid<>(Address.class, false);
 
     private TextField street;
     private TextField postalCode;
@@ -36,7 +31,7 @@ public class PaymentsView extends Div {
 
     private BeanValidationBinder<Address> binder;
 
-    private Address address;
+    //private Address address;
 
     public PaymentsView() {
         setId("payments-view");

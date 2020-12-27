@@ -18,35 +18,39 @@ import java.util.Map;
 @PageTitle("Home")
 public class HomeView extends Div {
 
-    public HomeView(UserService authService) {
+    public HomeView(UserService userService) {
         setId("home-view");
 
-        createTabs(authService);
+        createTabs(userService);
     }
 
     public void createTabs(UserService userService) {
-        VerticalLayout personalInformationVerticalLayout = createPersonalInformationLayout(userService);
+        VerticalLayout personalInfoVerticalLayout = createPersonalInformationLayout(userService);
+        VerticalLayout accountVerticalLayout = createBankAccountLayout(userService);
+        VerticalLayout transactionsVerticalLayout = createTransactionsLayout(userService);
 
-        Tab personalInformation = new Tab("Personal Information");
-        Tab transactions = new Tab("Transactions");
-        Tab bankAccount = new Tab("Bank Account");
-        Tabs tabs = new Tabs(false, personalInformation, transactions, bankAccount);
+        Tab personalInformationTab = new Tab("Personal Information");
+        Tab transactionsTab = new Tab("Transactions");
+        Tab accountTab = new Tab("Bank Account");
+        Tabs tabs = new Tabs(false, personalInformationTab, transactionsTab, accountTab);
 
         Div personalInformationDiv = new Div();
-        personalInformationDiv.add(personalInformationVerticalLayout);
-        personalInformationDiv.setVisible(false);
-
         Div transactionsDiv = new Div();
-        transactionsDiv.setVisible(false);
+        Div accountDiv = new Div();
 
-        Div accountInformationDiv = new Div();
-        accountInformationDiv.setVisible(false);
+        personalInformationDiv.add(personalInfoVerticalLayout);
+        transactionsDiv.add(transactionsVerticalLayout);
+        accountDiv.add(accountVerticalLayout);
+
+        personalInformationDiv.setVisible(false);
+        transactionsDiv.setVisible(false);
+        accountDiv.setVisible(false);
 
         Map<Tab, Component> tabsToPages = new HashMap<>();
-        tabsToPages.put(personalInformation, personalInformationVerticalLayout);
-        tabsToPages.put(transactions, transactionsDiv);
-        tabsToPages.put(bankAccount, accountInformationDiv);
-        Div pages = new Div(personalInformationVerticalLayout, transactionsDiv, accountInformationDiv);
+        tabsToPages.put(personalInformationTab, personalInformationDiv);
+        tabsToPages.put(transactionsTab, transactionsDiv);
+        tabsToPages.put(accountTab, accountDiv);
+        Div pages = new Div(personalInfoVerticalLayout, transactionsDiv, accountDiv);
 
         tabs.addSelectedChangeListener(event -> {
             tabsToPages.values().forEach(page -> page.setVisible(false));
@@ -81,5 +85,33 @@ public class HomeView extends Div {
         personalInformationVerticalLayout.setVisible(false);
 
         return personalInformationVerticalLayout;
+    }
+
+    public VerticalLayout createBankAccountLayout(UserService userService) {
+        String accountNumber = userService.getAccountNumber();
+        String accountBalance = userService.getAccountBalance();
+
+        Span accountNumberSpan = new Span("Account number: " + accountNumber);
+        Span accountBalanceSpan = new Span("Balance: " + accountBalance);
+
+        VerticalLayout accountVerticalLayout = new VerticalLayout();
+        accountVerticalLayout.add(accountNumberSpan, accountBalanceSpan);
+        accountVerticalLayout.setVisible(false);
+
+        return accountVerticalLayout;
+    }
+
+    public VerticalLayout createTransactionsLayout(UserService userService) {
+        String accountNumber = userService.getAccountNumber();
+        String accountBalance = userService.getAccountBalance();
+
+        Span accountNumberSpan = new Span("Account number: " + accountNumber);
+        Span accountBalanceSpan = new Span("Balance: " + accountBalance);
+
+        VerticalLayout accountVerticalLayout = new VerticalLayout();
+        accountVerticalLayout.add(accountNumberSpan, accountBalanceSpan);
+        accountVerticalLayout.setVisible(false);
+
+        return accountVerticalLayout;
     }
 }
