@@ -1,7 +1,9 @@
 package com.bank.application.backend.service;
 
+import com.bank.application.backend.entity.Account;
 import com.bank.application.backend.entity.Role;
 import com.bank.application.backend.entity.User;
+import com.bank.application.backend.repository.AccountRepository;
 import com.bank.application.backend.repository.UserRepository;
 import com.bank.application.ui.views.admin.AdminView;
 import com.bank.application.ui.views.cards.CardsView;
@@ -20,12 +22,14 @@ import java.util.List;
 
 @Service
 public class AuthService {
-
+    @Autowired
     private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
     private VaadinSession session;
 
-    public AuthService(@Autowired UserRepository userRepository) {
+    public AuthService(@Autowired UserRepository userRepository, AccountRepository accountRepository) {
         this.userRepository = userRepository;
+        this.accountRepository = accountRepository;
     }
 
     public void authenticate(String username, String password) throws AuthException {
@@ -65,7 +69,14 @@ public class AuthService {
 
     public void register(String username, String password, String firstName, String lastName,
                          String pesel, String address, String email, String phone) {
-        userRepository.save(new User(username, password, Role.USER, firstName, lastName, pesel, address, email, phone));
+        Account account = new Account(generateRandomAccountNumber());
+        User user = new User(username, password, Role.USER, firstName, lastName, pesel, address, email, phone);
+
+        user.setAccount(account);
+        account.setUser(user);
+
+        userRepository.save(user);
+        accountRepository.save(account);
     }
 
     public String getCurrentUserName() {
@@ -97,5 +108,18 @@ public class AuthService {
     }
 
     public static class AuthException extends Exception {
+    }
+
+    public String generateRandomAccountNumber() {
+        int min = 0;
+        int max = 9;
+        String accountNumber = "";
+
+        for (int i = 0; i < 26; i++) {
+            int randomNum = (int)(Math.random() * (max - min + 1) + min);
+            accountNumber += Integer.toString(randomNum);
+        }
+
+        return accountNumber;
     }
 }
