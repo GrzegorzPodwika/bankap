@@ -88,8 +88,8 @@ public class HomeView extends Div {
     }
 
     public VerticalLayout createBankAccountLayout(UserService userService) {
-        String accountNumber = userService.getAccountNumber();
-        String accountBalance = userService.getAccountBalance();
+        String accountNumber = userService.getCurrentUserName();
+        String accountBalance = userService.getCurrentFirstName();
 
         Span accountNumberSpan = new Span("Account number: " + accountNumber);
         Span accountBalanceSpan = new Span("Balance: " + accountBalance);
@@ -102,8 +102,8 @@ public class HomeView extends Div {
     }
 
     public VerticalLayout createTransactionsLayout(UserService userService) {
-        String accountNumber = userService.getAccountNumber();
-        String accountBalance = userService.getAccountBalance();
+        String accountNumber = userService.getCurrentUserName();
+        String accountBalance = userService.getCurrentFirstName();
 
         Span accountNumberSpan = new Span("Account number: " + accountNumber);
         Span accountBalanceSpan = new Span("Balance: " + accountBalance);

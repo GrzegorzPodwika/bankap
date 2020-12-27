@@ -13,6 +13,10 @@ public class Submission extends ItemClass {
     @JoinColumn(name = "user_id")
     private User user;
 
+    public Submission() {
+
+    }
+
     public Submission(String date) {
         this.date = date;
     }

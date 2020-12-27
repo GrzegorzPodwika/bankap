@@ -7,13 +7,16 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class Transaction extends ItemClass {
-
     private String date;
     private int amount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    public Transaction() {
+
+    }
 
     public Transaction(String date, int amount) {
         this.date = date;

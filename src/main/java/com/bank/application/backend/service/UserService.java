@@ -1,20 +1,18 @@
 package com.bank.application.backend.service;
 
 import com.bank.application.backend.entity.Account;
-import com.bank.application.backend.entity.Transaction;
 import com.bank.application.backend.entity.User;
 import com.bank.application.backend.repository.UserRepository;
 import com.vaadin.flow.server.VaadinSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class UserService {
+    @Autowired
     private final UserRepository userRepository;
 
-    public UserService(@Autowired UserRepository userRepository) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -50,15 +48,17 @@ public class UserService {
         return VaadinSession.getCurrent().getAttribute(User.class).getPhone();
     }
 
-    public List<Transaction> getTransactionList() {
+    /*public List<Transaction> getTransactionList() {
         return VaadinSession.getCurrent().getAttribute(User.class).getTransactionList();
-    }
+    }*/
 
-    public String getAccountNumber() {
-        return VaadinSession.getCurrent().getAttribute(User.class).getAccount().getAccountNumber();
+    /*public String getAccountNumber() {
+        Account account = VaadinSession.getCurrent().getAttribute(User.class).getAccount();
+        return account.getAccountNumber();
     }
 
     public String getAccountBalance() {
-        return VaadinSession.getCurrent().getAttribute(User.class).getAccount().getAccountBalance();
-    }
+        Account account = VaadinSession.getCurrent().getAttribute(User.class).getAccount();
+        return account.getAccountBalance();
+    }*/
 }

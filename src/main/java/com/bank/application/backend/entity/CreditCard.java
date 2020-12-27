@@ -6,7 +6,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class CreditCard extends ItemClass{
+public class CreditCard extends ItemClass {
 
     private String creditCardNumber;
 
@@ -17,6 +17,14 @@ public class CreditCard extends ItemClass{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    public CreditCard() {
+
+    }
+
+    public CreditCard(String creditCardNumber) {
+        this.creditCardNumber = creditCardNumber;
+    }
 
     public Account getAccount() {
         return account;
@@ -32,10 +40,6 @@ public class CreditCard extends ItemClass{
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public CreditCard(String creditCardNumber) {
-        this.creditCardNumber = creditCardNumber;
     }
 
     public String getCreditCardNumber() {

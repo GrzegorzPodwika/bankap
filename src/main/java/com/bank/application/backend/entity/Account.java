@@ -14,10 +14,25 @@ public class Account extends ItemClass {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
     private List<CreditCard> creditCardList;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    public Account() {
+
+    }
 
     public Account(String accountNumber) {
         this.accountBalance = "0";
         this.accountNumber = accountNumber;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getAccountBalance() {

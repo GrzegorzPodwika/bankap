@@ -19,8 +19,8 @@ public class User extends Person {
     private List<Transaction> transactionList;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<Submission> submissionList;
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id")
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "account_id",  referencedColumnName = "id")
     private Account account;
 
     public User() {
@@ -38,22 +38,9 @@ public class User extends Person {
         this.setAddress(address);
         this.setEmail(email);
         this.setPhone(phone);
-
-        account = new Account(generateRandomAccountNumber());
     }
 
-    public String generateRandomAccountNumber() {
-        int min = 0;
-        int max = 9;
-        String accountNumber = "";
 
-        for (int i = 0; i < 26; i++) {
-            int randomNum = (int)(Math.random() * (max - min + 1) + min);
-            accountNumber += Integer.toString(randomNum);
-        }
-
-        return accountNumber;
-    }
 
     public Account getAccount() {
         return account;

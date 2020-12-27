@@ -18,6 +18,10 @@ public class Credit extends ItemClass {
     @JoinColumn(name = "submission_id")
     private Submission submission;
 
+    public Credit() {
+
+    }
+
     public Credit(String begin, String end, int amount, int numberOfInstallments) {
         this.begin = begin;
         this.end = end;
