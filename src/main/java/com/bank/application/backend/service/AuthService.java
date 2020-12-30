@@ -9,6 +9,7 @@ import com.bank.application.other.Constants;
 import com.bank.application.ui.views.admin.AdminView;
 import com.bank.application.ui.views.cards.CardsView;
 import com.bank.application.ui.views.employee.EmployeeView;
+import com.bank.application.ui.views.employee.ManagePaymentsEmployeeView;
 import com.bank.application.ui.views.home.HomeView;
 import com.bank.application.ui.views.main.MainView;
 import com.bank.application.ui.views.payments.PaymentsView;
@@ -59,6 +60,7 @@ public class AuthService {
             routes.add(new AuthorizedRoute("cards", "Cards", CardsView.class));
         } else if (role == Role.EMPLOYEE) {
             routes.add(new AuthorizedRoute("home", "Home", HomeView.class));
+            routes.add(new AuthorizedRoute("managePayments", "ManagePayments", ManagePaymentsEmployeeView.class));
             routes.add(new AuthorizedRoute("employee", "Employee", EmployeeView.class));
         } else if (role == Role.ADMIN) {
             routes.add(new AuthorizedRoute("home", "Home", HomeView.class));
@@ -72,7 +74,7 @@ public class AuthService {
     public void register(String username, String password, String firstName, String lastName,
                          String pesel, String address, String email, String phone) {
         Account account = new Account(generateRandomAccountNumber());
-        User user = new User(username, password, Role.USER, firstName, lastName, pesel, address, email, phone);
+        User user = new User(username, password, Role.EMPLOYEE, firstName, lastName, pesel, address, email, phone);
 
         user.setAccount(account);
         account.setUser(user);

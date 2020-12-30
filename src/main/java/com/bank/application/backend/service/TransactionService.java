@@ -2,7 +2,6 @@ package com.bank.application.backend.service;
 
 import com.bank.application.backend.entity.Account;
 import com.bank.application.backend.entity.Transaction;
-import com.bank.application.backend.repository.AccountRepository;
 import com.bank.application.backend.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +10,7 @@ import java.util.List;
 
 
 @Service
-public class TransactionService{
+public class TransactionService {
     private final TransactionRepository repo;
 
     @Autowired
@@ -48,7 +47,15 @@ public class TransactionService{
         return repo.findAllTransactions(account);
     }
 
+    public List<Transaction> findAllByTimestamp() {
+        return repo.findAllByOrderByTimestampDesc();
+    }
+
     public void save(Transaction transaction) {
         repo.save(transaction);
+    }
+
+    public Transaction findByAccountAndTitle(Account receiverAccount, String transactionTitle) {
+        return repo.findByAccountAndTransactionTitle(receiverAccount, transactionTitle);
     }
 }
