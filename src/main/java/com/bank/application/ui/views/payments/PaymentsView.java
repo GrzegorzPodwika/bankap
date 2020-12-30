@@ -25,7 +25,6 @@ public class PaymentsView extends VerticalLayout {
 
     private User activeUser;
     private final AccountService accountService;
-    private final TransactionService transactionService;
     private final UserService userService;
 
 
@@ -33,7 +32,6 @@ public class PaymentsView extends VerticalLayout {
         setId("payments-view");
         this.userService = userService;
         this.accountService = accountService;
-        this.transactionService = transactionService;
 
         fetchActiveUser();
 
@@ -50,7 +48,7 @@ public class PaymentsView extends VerticalLayout {
         crud.setFindAllOperation(() -> transactionService.findAllByAccount(activeUser.getAccount()));
 
         crud.setAddOperation(transaction -> {
-            if(hasUserEnoughMoney(transaction) && isTransactionCorrect(transaction)) {
+            if (hasUserEnoughMoney(transaction) && isTransactionCorrect(transaction)) {
                 Optional<Account> searchReceiver = accountService.existAccountByAccountNumber(transaction.getReceiverAccountNumber());
 
                 if (searchReceiver.isPresent()) {
@@ -70,10 +68,10 @@ public class PaymentsView extends VerticalLayout {
                     receiverTransaction.setAmount(transferAmountPositive);
                     receiverTransaction.setReceiverAccountNumber(transaction.getReceiverAccountNumber());
                     receiverTransaction.setAccount(receiverAccount);
-                    
+
                     updateBalanceInSenderAndReceiverAccounts(senderAccount, receiverAccount, transferAmountPositive);
                     transactionService.add(transaction, receiverTransaction);
-                    
+
                     Notification.show("Pomyślnie wysłano przelew!", 3000, Notification.Position.MIDDLE);
                     return transaction;
                 } else {
@@ -124,11 +122,11 @@ public class PaymentsView extends VerticalLayout {
     private void updateBalanceInSenderAndReceiverAccounts(Account senderAccount, Account receiverAccount, double transferAmount) {
 
         double newBalanceSender = Double.parseDouble(senderAccount.getAccountBalance()) - transferAmount;
-        newBalanceSender =  Math.round(newBalanceSender * 100) / 100.0;
+        newBalanceSender = Math.round(newBalanceSender * 100) / 100.0;
         senderAccount.setAccountBalance(Double.toString(newBalanceSender));
 
         double newBalanceReceiver = Double.parseDouble(receiverAccount.getAccountBalance()) + transferAmount;
-        newBalanceReceiver =  Math.round(newBalanceReceiver*100) / 100.0;
+        newBalanceReceiver = Math.round(newBalanceReceiver * 100) / 100.0;
         receiverAccount.setAccountBalance(Double.toString(newBalanceReceiver));
 
         accountService.update(senderAccount);
