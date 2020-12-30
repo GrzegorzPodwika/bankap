@@ -2,9 +2,12 @@ package com.bank.application.backend.entity;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class User extends Person {
@@ -13,13 +16,8 @@ public class User extends Person {
     private String passwordSalt;
     private String passwordHash;
     private Role role;
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private List<CreditCard> creditCardList;
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private List<Transaction> transactionList;
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private List<Submission> submissionList;
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "account_id",  referencedColumnName = "id")
     private Account account;
 
@@ -40,38 +38,12 @@ public class User extends Person {
         this.setPhone(phone);
     }
 
-
-
     public Account getAccount() {
         return account;
     }
 
     public void setAccount(Account account) {
         this.account = account;
-    }
-
-    public List<CreditCard> getCreditCardList() {
-        return creditCardList;
-    }
-
-    public void setCreditCardList(List<CreditCard> creditCardList) {
-        this.creditCardList = creditCardList;
-    }
-
-    public List<Transaction> getTransactionList() {
-        return transactionList;
-    }
-
-    public void setTransactionList(List<Transaction> transactionList) {
-        this.transactionList = transactionList;
-    }
-
-    public List<Submission> getSubmissionList() {
-        return submissionList;
-    }
-
-    public void setSubmissionList(List<Submission> submissionList) {
-        this.submissionList = submissionList;
     }
 
     public boolean checkPassword(String plainPassword) {
@@ -110,4 +82,14 @@ public class User extends Person {
         this.role = role;
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                ", passwordSalt='" + passwordSalt + '\'' +
+                ", passwordHash='" + passwordHash + '\'' +
+                ", role=" + role +
+                ", account=" + account +
+                '}';
+    }
 }

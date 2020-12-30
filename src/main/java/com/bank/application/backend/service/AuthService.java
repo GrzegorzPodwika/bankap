@@ -5,6 +5,7 @@ import com.bank.application.backend.entity.Role;
 import com.bank.application.backend.entity.User;
 import com.bank.application.backend.repository.AccountRepository;
 import com.bank.application.backend.repository.UserRepository;
+import com.bank.application.other.Constants;
 import com.bank.application.ui.views.admin.AdminView;
 import com.bank.application.ui.views.cards.CardsView;
 import com.bank.application.ui.views.employee.EmployeeView;
@@ -35,6 +36,7 @@ public class AuthService {
     public void authenticate(String username, String password) throws AuthException {
         User user = userRepository.getByUsername(username);
         if (user != null && user.checkPassword(password)) {
+            VaadinSession.getCurrent().setAttribute(Constants.USER_ID, user.getId());
             VaadinSession.getCurrent().setAttribute(User.class, user);
             createRoutes(user.getRole());
         } else {
@@ -43,7 +45,7 @@ public class AuthService {
     }
 
     private void createRoutes(Role role) {
-        getAuthorizedRoutes(role).stream()
+        getAuthorizedRoutes(role)
                 .forEach(route ->
                         RouteConfiguration.forSessionScope().setRoute(route.route, route.view, MainView.class));
     }

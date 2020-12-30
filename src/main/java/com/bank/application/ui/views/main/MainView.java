@@ -4,6 +4,9 @@ import java.util.Optional;
 
 import com.bank.application.backend.entity.User;
 import com.bank.application.backend.service.AuthService;
+import com.bank.application.backend.service.UserService;
+import com.bank.application.other.Constants;
+import com.bank.application.ui.views.home.HomeView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.UI;
@@ -26,6 +29,8 @@ import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.server.VaadinSession;
 
+import static com.bank.application.ui.views.home.HomeView.*;
+
 /**
  * The main view is a top-level placeholder for other views.
  */
@@ -37,9 +42,12 @@ public class MainView extends AppLayout {
     private final Tabs menu;
     private H1 viewTitle;
     private final AuthService authService;
+    private final UserService userService;
+    private User user;
 
-    public MainView(AuthService authService) {
+    public MainView(AuthService authService, UserService userService) {
         this.authService = authService;
+        this.userService = userService;
         setPrimarySection(Section.DRAWER);
         addToNavbar(true, createHeaderContent());
         menu = createMenu();
@@ -101,8 +109,25 @@ public class MainView extends AppLayout {
         tabs.addThemeVariants(TabsVariant.LUMO_MINIMAL);
         tabs.setId("tabs");
         tabs.add(createMenuItems());
+/*        try {
+            fetchUserById();
+            tabs.add(createMenuItems());
+        } catch (UserNotFoundException e) {
+            System.out.println("User has not been found!");
+        }*/
         return tabs;
     }
+
+/*    private void fetchUserById() throws UserNotFoundException {
+        Integer userId = (Integer) VaadinSession.getCurrent().getAttribute(Constants.USER_ID);
+        Optional<User> fetchedUpdatedUser = userService.findUserById(userId);
+        if (fetchedUpdatedUser.isPresent()) {
+            user = fetchedUpdatedUser.get();
+        } else {
+            throw new UserNotFoundException();
+        }
+    }*/
+
 
     private Component[] createMenuItems() {
         User user = VaadinSession.getCurrent().getAttribute(User.class);
@@ -110,6 +135,7 @@ public class MainView extends AppLayout {
                 .map(r -> createTab(r.getName(), r.getView()))
                 .toArray(Component[]::new);
     }
+
 
     private static Tab createTab(String text, Class<? extends Component> navigationTarget) {
         final Tab tab = new Tab();

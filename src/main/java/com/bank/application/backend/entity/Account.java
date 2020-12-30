@@ -1,5 +1,8 @@
 package com.bank.application.backend.entity;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -9,12 +12,7 @@ public class Account extends ItemClass {
     private String accountNumber;
     private String accountBalance;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
-    private List<Credit> creditList;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
-    private List<CreditCard> creditCardList;
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -51,19 +49,11 @@ public class Account extends ItemClass {
         this.accountNumber = accountNumber;
     }
 
-    public List<Credit> getCreditList() {
-        return creditList;
-    }
 
-    public void setCreditList(List<Credit> creditList) {
-        this.creditList = creditList;
-    }
-
-    public List<CreditCard> getCreditCardList() {
-        return creditCardList;
-    }
-
-    public void setCreditCardList(List<CreditCard> creditCardList) {
-        this.creditCardList = creditCardList;
+    @Override
+    public String toString() {
+        return "Account{" +
+                "accountNumber='" + accountNumber + '\'' +
+                '}';
     }
 }

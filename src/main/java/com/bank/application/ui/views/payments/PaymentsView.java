@@ -1,160 +1,139 @@
 package com.bank.application.ui.views.payments;
 
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.splitlayout.SplitLayout;
-import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.bank.application.backend.entity.Account;
+import com.bank.application.backend.entity.Transaction;
+import com.bank.application.backend.entity.User;
+import com.bank.application.backend.service.AccountService;
+import com.bank.application.backend.service.TransactionService;
+import com.bank.application.backend.service.UserService;
+import com.bank.application.other.Constants;
+import com.bank.application.ui.views.home.HomeView.UserNotFoundException;
+import com.bank.application.ui.views.main.MainView;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
+import org.vaadin.crudui.crud.CrudOperation;
+import org.vaadin.crudui.crud.impl.GridCrud;
 
-import com.bank.application.ui.views.main.MainView;
-import com.vaadin.flow.component.textfield.TextField;
-import org.apache.tomcat.jni.Address;
+import java.util.Optional;
 
 @Route(value = "payments", layout = MainView.class)
 @PageTitle("Payments")
-@CssImport("./styles/views/payments/payments-view.css")
-public class PaymentsView extends Div {
+public class PaymentsView extends VerticalLayout {
 
-    //private Grid<Address> grid = new Grid<>(Address.class, false);
+    private User activeUser;
+    private final AccountService accountService;
+    private final TransactionService transactionService;
+    private final UserService userService;
 
-    private TextField street;
-    private TextField postalCode;
-    private TextField city;
-    private TextField state;
-    private TextField country;
 
-    private Button cancel = new Button("Cancel");
-    private Button save = new Button("Save");
-
-    private BeanValidationBinder<Address> binder;
-
-    //private Address address;
-
-    public PaymentsView() {
+    public PaymentsView(TransactionService transactionService, AccountService accountService, UserService userService) {
         setId("payments-view");
-        // Create UI
-        SplitLayout splitLayout = new SplitLayout();
-        splitLayout.setSizeFull();
+        this.userService = userService;
+        this.accountService = accountService;
+        this.transactionService = transactionService;
 
-        //createGridLayout(splitLayout);
-        //createEditorLayout(splitLayout);
+        fetchActiveUser();
 
-        add(splitLayout);
-    }
+        GridCrud<Transaction> crud = new GridCrud<>(Transaction.class);
 
-/*        // Configure Grid
-        grid.addColumn("street").setAutoWidth(true);
-        grid.addColumn("postalCode").setAutoWidth(true);
-        grid.addColumn("city").setAutoWidth(true);
-        grid.addColumn("state").setAutoWidth(true);
-        grid.addColumn("country").setAutoWidth(true);
-        grid.setDataProvider(new CrudServiceDataProvider<>(addressService));
-        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-        grid.setHeightFull();
+        crud.getGrid().setColumns("transactionTitle", "amount", "receiverAccountNumber", "date");
+        crud.getGrid().setColumnReorderingAllowed(true);
+        crud.getCrudFormFactory().setUseBeanValidation(true);
 
-        // when a row is selected or deselected, populate form
-        grid.asSingleSelect().addValueChangeListener(event -> {
-            if (event.getValue() != null) {
-                Optional<Address> addressFromBackend = addressService.get(event.getValue().getId());
-                // when a row is selected but the data is no longer available, refresh grid
-                if (addressFromBackend.isPresent()) {
-                    populateForm(addressFromBackend.get());
+        crud.getCrudFormFactory().setVisibleProperties(CrudOperation.ADD,
+                "transactionTitle", "amount", "receiverAccountNumber");
+
+
+        crud.setFindAllOperation(() -> transactionService.findAllByAccount(activeUser.getAccount()));
+
+        crud.setAddOperation(transaction -> {
+            if(hasUserEnoughMoney(transaction) && isTransactionCorrect(transaction)) {
+                Optional<Account> searchReceiver = accountService.existAccountByAccountNumber(transaction.getReceiverAccountNumber());
+
+                if (searchReceiver.isPresent()) {
+                    Account senderAccount = activeUser.getAccount();
+                    Account receiverAccount = searchReceiver.get();
+
+                    double transferAmountPositive = transaction.getAmount();
+                    if (transaction.getAmount() < 0.0) {
+                        transferAmountPositive *= -1.0;
+                    }
+
+                    transaction.setAmount(transferAmountPositive * -1.0);
+                    transaction.setAccount(senderAccount);
+
+                    Transaction receiverTransaction = new Transaction();
+                    receiverTransaction.setTransactionTitle(transaction.getTransactionTitle());
+                    receiverTransaction.setAmount(transferAmountPositive);
+                    receiverTransaction.setReceiverAccountNumber(transaction.getReceiverAccountNumber());
+                    receiverTransaction.setAccount(receiverAccount);
+                    
+                    updateBalanceInSenderAndReceiverAccounts(senderAccount, receiverAccount, transferAmountPositive);
+                    transactionService.add(transaction, receiverTransaction);
+                    
+                    Notification.show("Pomyślnie wysłano przelew!", 3000, Notification.Position.MIDDLE);
+                    return transaction;
                 } else {
-                    refreshGrid();
+                    Notification.show("Nie znaleziono klienta o podanym numerze konta!");
+                    return null;
                 }
             } else {
-                clearForm();
+                Notification.show("Nie masz wystarczająco pieniędzy na koncie!");
+                return null;
             }
         });
 
-        // Configure Form
-        binder = new BeanValidationBinder<>(Address.class);
+        crud.setFindAllOperationVisible(false);
+        crud.setUpdateOperationVisible(false);
+        crud.setDeleteOperationVisible(false);
+        crud.setDeleteOperation(transactionService::delete);
 
-        // Bind fields. This where you'd define e.g. validation rules
-
-        binder.bindInstanceFields(this);
-
-        cancel.addClickListener(e -> {
-            clearForm();
-            refreshGrid();
-        });
-
-        save.addClickListener(e -> {
-            try {
-                if (this.address == null) {
-                    this.address = new Address();
-                }
-                binder.writeBean(this.address);
-                addressService.update(this.address);
-                clearForm();
-                refreshGrid();
-                Notification.show("Address details stored.");
-            } catch (ValidationException validationException) {
-                Notification.show("An exception happened while trying to store the address details.");
-            }
-        });
-
+        setSizeFull();
+        add(crud);
     }
 
-    private void createEditorLayout(SplitLayout splitLayout) {
-        Div editorLayoutDiv = new Div();
-        editorLayoutDiv.setId("editor-layout");
-
-        Div editorDiv = new Div();
-        editorDiv.setId("editor");
-        editorLayoutDiv.add(editorDiv);
-
-        FormLayout formLayout = new FormLayout();
-        street = new TextField("Street");
-        postalCode = new TextField("Postal Code");
-        city = new TextField("City");
-        state = new TextField("State");
-        country = new TextField("Country");
-        AbstractField<?, ?>[] fields = new AbstractField<?, ?>[]{street, postalCode, city, state, country};
-
-        for (AbstractField<?, ?> field : fields) {
-            ((HasStyle) field).addClassName("full-width");
+    private void fetchActiveUser() {
+        try {
+            fetchUserById();
+        } catch (UserNotFoundException e) {
+            System.out.println("User has not been found!");
         }
-        formLayout.add(fields);
-        editorDiv.add(formLayout);
-        createButtonLayout(editorLayoutDiv);
-
-        splitLayout.addToSecondary(editorLayoutDiv);
     }
 
-    private void createButtonLayout(Div editorLayoutDiv) {
-        HorizontalLayout buttonLayout = new HorizontalLayout();
-        buttonLayout.setId("button-layout");
-        buttonLayout.setWidthFull();
-        buttonLayout.setSpacing(true);
-        cancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        buttonLayout.add(save, cancel);
-        editorLayoutDiv.add(buttonLayout);
+    private void fetchUserById() throws UserNotFoundException {
+        Integer userId = (Integer) VaadinSession.getCurrent().getAttribute(Constants.USER_ID);
+        Optional<User> fetchedUpdatedUser = userService.findUserById(userId);
+        if (fetchedUpdatedUser.isPresent()) {
+            activeUser = fetchedUpdatedUser.get();
+        } else {
+            throw new UserNotFoundException();
+        }
     }
 
-    private void createGridLayout(SplitLayout splitLayout) {
-        Div wrapper = new Div();
-        wrapper.setId("grid-wrapper");
-        wrapper.setWidthFull();
-        splitLayout.addToPrimary(wrapper);
-        wrapper.add(grid);
+    private boolean hasUserEnoughMoney(Transaction transaction) {
+        return Double.parseDouble(activeUser.getAccount().getAccountBalance()) >= transaction.getAmount();
     }
 
-    private void refreshGrid() {
-        grid.select(null);
-        grid.getDataProvider().refreshAll();
+    private boolean isTransactionCorrect(Transaction transaction) {
+        return transaction.getTransactionTitle() != null && !transaction.getTransactionTitle().isEmpty() && transaction.getAmount() != 0.0;
     }
 
-    private void clearForm() {
-        populateForm(null);
+    private void updateBalanceInSenderAndReceiverAccounts(Account senderAccount, Account receiverAccount, double transferAmount) {
+
+        double newBalanceSender = Double.parseDouble(senderAccount.getAccountBalance()) - transferAmount;
+        newBalanceSender =  Math.round(newBalanceSender * 100) / 100.0;
+        senderAccount.setAccountBalance(Double.toString(newBalanceSender));
+
+        double newBalanceReceiver = Double.parseDouble(receiverAccount.getAccountBalance()) + transferAmount;
+        newBalanceReceiver =  Math.round(newBalanceReceiver*100) / 100.0;
+        receiverAccount.setAccountBalance(Double.toString(newBalanceReceiver));
+
+        accountService.update(senderAccount);
+        accountService.update(receiverAccount);
     }
 
-    private void populateForm(Address value) {
-        this.address = value;
-        binder.readBean(this.address);
-    }*/
+
 }

@@ -10,11 +10,11 @@ public class Credit extends ItemClass {
     private int amount;
     private int numberOfInstallments;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "account_id")
     private Account account;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "submission_id")
     private Submission submission;
 
