@@ -10,13 +10,9 @@ public class CreditCard extends ItemClass {
 
     private String creditCardNumber;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "account_id")
     private Account account;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
 
     public CreditCard() {
 
@@ -32,14 +28,6 @@ public class CreditCard extends ItemClass {
 
     public void setAccount(Account account) {
         this.account = account;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public String getCreditCardNumber() {

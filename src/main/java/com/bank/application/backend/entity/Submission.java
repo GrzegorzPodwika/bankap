@@ -9,9 +9,10 @@ import javax.persistence.ManyToOne;
 public class Submission extends ItemClass {
 
     private String date;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "account_id")
+    private Account account;
 
     public Submission() {
 
@@ -21,12 +22,13 @@ public class Submission extends ItemClass {
         this.date = date;
     }
 
-    public User getUser() {
-        return user;
+
+    public Account getAccount() {
+        return account;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setAccount(Account account) {
+        this.account = account;
     }
 
     public String getDate() {

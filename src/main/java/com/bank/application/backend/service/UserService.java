@@ -7,6 +7,8 @@ import com.vaadin.flow.server.VaadinSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
     @Autowired
@@ -16,49 +18,8 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public UserRepository getRepository() {
-        return userRepository;
+    public Optional<User> findUserById(Integer id) {
+        return userRepository.findById(id);
     }
 
-    public String getCurrentUserName() {
-        return VaadinSession.getCurrent().getAttribute(User.class).getUsername();
-    }
-
-    public String getCurrentFirstName() {
-        return VaadinSession.getCurrent().getAttribute(User.class).getFirstName();
-    }
-
-    public String getCurrentLastName() {
-        return VaadinSession.getCurrent().getAttribute(User.class).getLastName();
-    }
-
-    public String getCurrentPesel() {
-        return VaadinSession.getCurrent().getAttribute(User.class).getPesel();
-    }
-
-    public String getCurrentAddress() {
-        return VaadinSession.getCurrent().getAttribute(User.class).getAddress();
-    }
-
-    public String getCurrentEmail() {
-        return VaadinSession.getCurrent().getAttribute(User.class).getEmail();
-    }
-
-    public String getCurrentPhone() {
-        return VaadinSession.getCurrent().getAttribute(User.class).getPhone();
-    }
-
-    /*public List<Transaction> getTransactionList() {
-        return VaadinSession.getCurrent().getAttribute(User.class).getTransactionList();
-    }*/
-
-    /*public String getAccountNumber() {
-        Account account = VaadinSession.getCurrent().getAttribute(User.class).getAccount();
-        return account.getAccountNumber();
-    }
-
-    public String getAccountBalance() {
-        Account account = VaadinSession.getCurrent().getAttribute(User.class).getAccount();
-        return account.getAccountBalance();
-    }*/
 }
