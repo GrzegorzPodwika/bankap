@@ -1,4 +1,4 @@
-package com.bank.application.ui.views.payments;
+package com.bank.application.ui.views.user.payments;
 
 import com.bank.application.backend.entity.Account;
 import com.bank.application.backend.entity.Transaction;
