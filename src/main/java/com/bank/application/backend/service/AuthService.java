@@ -7,12 +7,13 @@ import com.bank.application.backend.repository.AccountRepository;
 import com.bank.application.backend.repository.UserRepository;
 import com.bank.application.other.Constants;
 import com.bank.application.ui.views.admin.AdminView;
-import com.bank.application.ui.views.cards.CardsView;
+import com.bank.application.ui.views.user.cards.CardsView;
+import com.bank.application.ui.views.user.credit.CreditView;
 import com.bank.application.ui.views.employee.EmployeeView;
 import com.bank.application.ui.views.employee.ManagePaymentsEmployeeView;
 import com.bank.application.ui.views.home.HomeView;
 import com.bank.application.ui.views.main.MainView;
-import com.bank.application.ui.views.payments.PaymentsView;
+import com.bank.application.ui.views.user.payments.PaymentsView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.router.RouteConfiguration;
 import com.vaadin.flow.server.VaadinSession;
@@ -58,6 +59,7 @@ public class AuthService {
             routes.add(new AuthorizedRoute("home", "Home", HomeView.class));
             routes.add(new AuthorizedRoute("payments", "Payments", PaymentsView.class));
             routes.add(new AuthorizedRoute("cards", "Cards", CardsView.class));
+            routes.add(new AuthorizedRoute("credits", "Credits", CreditView.class));
         } else if (role == Role.EMPLOYEE) {
             routes.add(new AuthorizedRoute("home", "Home", HomeView.class));
             routes.add(new AuthorizedRoute("managePayments", "ManagePayments", ManagePaymentsEmployeeView.class));

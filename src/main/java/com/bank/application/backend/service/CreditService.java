@@ -1,8 +1,13 @@
 package com.bank.application.backend.service;
 
+import com.bank.application.backend.entity.Account;
+import com.bank.application.backend.entity.Credit;
+import com.bank.application.backend.entity.CreditCard;
 import com.bank.application.backend.repository.CreditRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class CreditService {
@@ -16,4 +21,14 @@ public class CreditService {
     public CreditRepository getCreditRepository() {
         return creditRepository;
     }
+
+    public List<Credit> findAllByAccount(Account account) {
+        return creditRepository.findAllCredits(account);
+    }
+
+    public void delete(Credit credit) {
+        creditRepository.delete(credit);
+    }
+
+    public void save(Credit credit) { creditRepository.save(credit); }
 }
