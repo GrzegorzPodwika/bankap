@@ -7,6 +7,7 @@ import com.bank.application.backend.repository.AccountRepository;
 import com.bank.application.backend.repository.UserRepository;
 import com.bank.application.other.Constants;
 import com.bank.application.ui.views.admin.AdminView;
+import com.bank.application.ui.views.credentials.CredentialsView;
 import com.bank.application.ui.views.user.cards.CardsView;
 import com.bank.application.ui.views.user.credit.CreditView;
 import com.bank.application.ui.views.employee.EmployeeView;
@@ -57,15 +58,18 @@ public class AuthService {
 
         if (role == Role.USER) {
             routes.add(new AuthorizedRoute("home", "Home", HomeView.class));
+            routes.add(new AuthorizedRoute("credentials", "Credentials", CredentialsView.class));
             routes.add(new AuthorizedRoute("payments", "Payments", PaymentsView.class));
             routes.add(new AuthorizedRoute("cards", "Cards", CardsView.class));
             routes.add(new AuthorizedRoute("credits", "Credits", CreditView.class));
         } else if (role == Role.EMPLOYEE) {
             routes.add(new AuthorizedRoute("home", "Home", HomeView.class));
+            routes.add(new AuthorizedRoute("credentials", "Credentials", CredentialsView.class));
             routes.add(new AuthorizedRoute("managePayments", "ManagePayments", ManagePaymentsEmployeeView.class));
             routes.add(new AuthorizedRoute("employee", "Employee", EmployeeView.class));
         } else if (role == Role.ADMIN) {
             routes.add(new AuthorizedRoute("home", "Home", HomeView.class));
+            routes.add(new AuthorizedRoute("credentials", "Credentials", CredentialsView.class));
             routes.add(new AuthorizedRoute("admin", "Admin", AdminView.class));
 
         }
