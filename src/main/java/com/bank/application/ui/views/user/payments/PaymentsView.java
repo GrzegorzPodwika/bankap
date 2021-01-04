@@ -35,7 +35,6 @@ import java.util.stream.Stream;
 @PageTitle("Payments")
 public class PaymentsView extends VerticalLayout {
 
-    private byte[] pdfByteArray;
     private User activeUser;
     private final AccountService accountService;
     private final UserService userService;
