@@ -25,7 +25,7 @@ public class User extends Person {
     }
 
     public User(String username, String plainPassword, Role role, String firstName, String lastName,
-                String pesel, String address, String email, String phone) {
+                String pesel, String address, String email, String phone, String birthDate) {
         this.username = username;
         this.role = role;
         this.passwordSalt = RandomStringUtils.random(32);
@@ -36,6 +36,7 @@ public class User extends Person {
         this.setAddress(address);
         this.setEmail(email);
         this.setPhone(phone);
+        this.setBirthDate(birthDate);
     }
 
     public Account getAccount() {

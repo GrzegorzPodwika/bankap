@@ -72,7 +72,8 @@ public class RegisterView extends Composite {
                         pesel.getValue(),
                         address.getValue(),
                         emailField.getValue(),
-                        phone.getValue()
+                        phone.getValue(),
+                        dateOfBirth.getValue().toString()
                 )));
 
         verticalLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
@@ -81,7 +82,7 @@ public class RegisterView extends Composite {
     }
 
     private void register(String username, String password, String confirmPassword, String firstName, String lastName,
-                          String pesel, String address, String email, String phone) {
+                          String pesel, String address, String email, String phone, String birthDate) {
 
         if (username.trim().isEmpty()) {
             Notification.show("Enter a username");
@@ -90,7 +91,7 @@ public class RegisterView extends Composite {
         } else if(!password.equals(confirmPassword)) {
             Notification.show("Passwords don't match!");
         } else {
-            authService.register(username, password, firstName, lastName, pesel, address, email, phone);
+            authService.register(username, password, firstName, lastName, pesel, address, email, phone, birthDate);
             Notification.show("Registration succeeded.");
             try {
                 Thread.sleep(1000);
