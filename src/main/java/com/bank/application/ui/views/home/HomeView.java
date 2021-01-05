@@ -59,7 +59,7 @@ public class HomeView extends Div {
         Label labelAddress = new Label("Address: " + user.getAddress());
         Label labelEmail = new Label("Email: " + user.getEmail());
         Label labelPhone = new Label("Phone: " + user.getPhone());
-
+        Label labelBirthDate = new Label("BirthDate: " + user.getBirthDate());
 
 /*
         FormLayout credentialsLayout = new FormLayout(
@@ -99,7 +99,8 @@ public class HomeView extends Div {
                 labelPesel,
                 labelAddress,
                 labelEmail,
-                labelPhone
+                labelPhone,
+                labelBirthDate
         );
 
         verticalLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);

@@ -16,6 +16,7 @@ public abstract class Person {
     private String address;
     private String email;
     private String phone;
+    private String birthDate;
 
     public Integer getId() {
         return id;
@@ -92,5 +93,13 @@ public abstract class Person {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(String birthDate) {
+        this.birthDate = birthDate;
     }
 }

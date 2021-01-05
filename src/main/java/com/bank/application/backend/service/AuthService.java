@@ -78,9 +78,9 @@ public class AuthService {
     }
 
     public void register(String username, String password, String firstName, String lastName,
-                         String pesel, String address, String email, String phone) {
+                         String pesel, String address, String email, String phone, String birthDate) {
         Account account = new Account(generateRandomAccountNumber());
-        User user = new User(username, password, Role.EMPLOYEE, firstName, lastName, pesel, address, email, phone);
+        User user = new User(username, password, Role.EMPLOYEE, firstName, lastName, pesel, address, email, phone, birthDate);
 
         user.setAccount(account);
         account.setUser(user);
