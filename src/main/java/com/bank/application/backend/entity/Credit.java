@@ -18,6 +18,28 @@ public class Credit extends ItemClass {
     @JoinColumn(name = "submission_id")
     private Submission submission;
 
+    @Transient
+    private String submissionDate;
+
+    public String getSubmissionDate() {
+        return submission.getDate();
+    }
+
+    public void setSubmissionDate(String submissionDate) {
+        submission.setDate(submissionDate);
+    }
+
+    @Transient
+    private Boolean submissionApproved;
+
+    public Boolean getSubmissionApproved() {
+        return submission.getApproved();
+    }
+
+    public void setSubmissionApproved(Boolean submissionApproved) {
+        submission.setApproved(submissionApproved);
+    }
+
     public Credit() {
 
     }
