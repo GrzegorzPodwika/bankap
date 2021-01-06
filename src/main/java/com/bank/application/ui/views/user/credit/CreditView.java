@@ -18,7 +18,12 @@ import com.vaadin.flow.server.VaadinSession;
 import org.vaadin.crudui.crud.CrudOperation;
 import org.vaadin.crudui.crud.impl.GridCrud;
 
-import java.util.Optional;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Route(value = "credits", layout = MainView.class)
 @PageTitle("Credits | BankAP")
@@ -68,12 +73,47 @@ public class CreditView extends Div {
             credit.setAccount(account);
             credit.setSubmission(submission);
 
+            if (credit.getBegin() == null || credit.getEnd() == null) {
+                Notification.show("Begin and end date cannot be empty!");
+                return null;
+            }
+
+            Pattern compiledPattern = Pattern.compile("^(19|20)\\d\\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$");
+            Matcher matcherBegin = compiledPattern.matcher(credit.getBegin());
+            Matcher matcherEnd = compiledPattern.matcher(credit.getEnd());
+
+            if(! matcherBegin.matches() || ! matcherEnd.matches()) {
+                Notification.show("Incorrect date format! Enter date like yyyy-mm-dd");
+                return null;
+            }
+
+
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
+            try {
+                Date beginDate = simpleDateFormat.parse(credit.getBegin());
+                Date endDate = simpleDateFormat.parse(credit.getEnd());
+
+                if(computeDiff(beginDate, endDate).get(TimeUnit.DAYS) < credit.getNumberOfInstallments() * 30) {
+                    Notification.show("The time interval between start date and end date must be at least equal " +
+                            "(number of installments> = number of months)");
+
+                    System.out.println(credit.getBegin() + " " + credit.getEnd());
+                    System.out.println(computeDiff(beginDate, endDate).get(TimeUnit.DAYS) + " " + credit.getNumberOfInstallments() * 30);
+                    return null;
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+
             submissionService.save(submission);
             creditService.save(credit);
 
             Notification.show("Pomyślnie utworzono kredyt!", 3000, Notification.Position.MIDDLE);
             return credit;
         });
+
+        crud.setShowNotifications(false);
 
         crud.setFindAllOperationVisible(false);
         crud.setUpdateOperationVisible(false);
@@ -83,6 +123,31 @@ public class CreditView extends Div {
 
         setSizeFull();
         add(crud);
+    }
+
+    public static Map<TimeUnit, Long> computeDiff(Date date1, Date date2) {
+
+        long diffInMillies = date2.getTime() - date1.getTime();
+
+        List<TimeUnit> units = new ArrayList<TimeUnit>(EnumSet.allOf(TimeUnit.class));
+        Collections.reverse(units);
+
+        // create the result map of TimeUnit and difference
+        Map<TimeUnit, Long> result = new LinkedHashMap<TimeUnit, Long>();
+        long milliesRest = diffInMillies;
+
+        for (TimeUnit unit : units) {
+
+            // calculate difference in millisecond
+            long diff = unit.convert(milliesRest, TimeUnit.MILLISECONDS);
+            long diffInMilliesForUnit = unit.toMillis(diff);
+            milliesRest = milliesRest - diffInMilliesForUnit;
+
+            // put the result in the map
+            result.put(unit, diff);
+        }
+
+        return result;
     }
 
     private void fetchActiveUser() {
