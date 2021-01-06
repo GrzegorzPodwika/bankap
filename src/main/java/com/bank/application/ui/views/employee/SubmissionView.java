@@ -1,11 +1,11 @@
 package com.bank.application.ui.views.employee;
 
+import com.bank.application.backend.entity.Account;
 import com.bank.application.backend.entity.Credit;
 import com.bank.application.backend.entity.Submission;
 import com.bank.application.backend.service.AccountService;
 import com.bank.application.backend.service.CreditService;
 import com.bank.application.backend.service.SubmissionService;
-import com.bank.application.backend.service.UserService;
 import com.bank.application.ui.views.main.MainView;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -19,10 +19,12 @@ import org.vaadin.crudui.crud.impl.GridCrud;
 public class SubmissionView extends VerticalLayout {
     private final CreditService creditService;
     private final SubmissionService submissionService;
+    private final AccountService accountService;
 
-    public SubmissionView(CreditService creditService, SubmissionService submissionService) {
+    public SubmissionView(CreditService creditService, SubmissionService submissionService, AccountService accountService) {
         this.creditService = creditService;
         this.submissionService = submissionService;
+        this.accountService = accountService;
 
         createGrid();
     }
@@ -30,7 +32,8 @@ public class SubmissionView extends VerticalLayout {
     public void createGrid() {
         GridCrud<Credit> crud = new GridCrud<>(Credit.class);
 
-        crud.getGrid().setColumns("submissionDate", "amount", "numberOfInstallments", "begin", "end", "submissionApproved");
+        crud.getGrid().setColumns("submissionDate", "accountNumber", "amount", "numberOfInstallments",
+                "begin", "end", "submissionApproved");
 
         crud.getCrudFormFactory().setUseBeanValidation(true);
         crud.getCrudFormFactory().setVisibleProperties(CrudOperation.UPDATE,  "submissionApproved");
@@ -40,13 +43,21 @@ public class SubmissionView extends VerticalLayout {
         crud.setFindAllOperation(() -> creditService.findAllBySubmissionApproved(false));
         crud.setUpdateOperation(credit -> {
             Submission submission = submissionService.findById(credit.getSubmission().getId()).get();
+            Account account = accountService.findById(credit.getAccount().getId()).get();
 
             submission.setApproved(credit.getSubmission().getApproved());
+            Long newAccountBalance = Long.parseLong(account.getAccountBalance()) + credit.getAmount();
+
+            account.setAccountBalance(Long.toString(newAccountBalance));
+
+            accountService.save(account);
             submissionService.save(submission);
             Notification.show("Submission approved");
 
             return credit;
         });
+
+        crud.getGrid().getColumns().forEach(col -> col.setAutoWidth(true));
 
         crud.setShowNotifications(false);
 

@@ -19,6 +19,13 @@ public class Credit extends ItemClass {
     private Submission submission;
 
     @Transient
+    private String accountNumber;
+
+    public String getAccountNumber() {
+        return account.getAccountNumber();
+    }
+
+    @Transient
     private String submissionDate;
 
     public String getSubmissionDate() {

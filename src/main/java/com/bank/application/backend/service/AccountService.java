@@ -1,6 +1,7 @@
 package com.bank.application.backend.service;
 
 import com.bank.application.backend.entity.Account;
+import com.bank.application.backend.entity.Credit;
 import com.bank.application.backend.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,5 +25,15 @@ public class AccountService {
     public void update(Account account) {
         accountRepository.save(account);
     }
+
+    public Optional<Account> findById(Integer id) {
+
+        return accountRepository.findById(id);
+    }
+
+    public void save(Account account) {
+        accountRepository.save(account);
+    }
+
 }
 
