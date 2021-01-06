@@ -7,12 +7,19 @@ import com.bank.application.backend.service.AccountService;
 import com.bank.application.backend.service.CreditService;
 import com.bank.application.backend.service.SubmissionService;
 import com.bank.application.ui.views.main.MainView;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.vaadin.crudui.crud.CrudOperation;
 import org.vaadin.crudui.crud.impl.GridCrud;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Route(value = "submission", layout = MainView.class)
 @PageTitle("Submission | BankAP")
@@ -26,10 +33,10 @@ public class SubmissionView extends VerticalLayout {
         this.submissionService = submissionService;
         this.accountService = accountService;
 
-        createGrid();
+        createTabs();
     }
 
-    public void createGrid() {
+    public GridCrud<Credit> createGrid(Boolean approved) {
         GridCrud<Credit> crud = new GridCrud<>(Credit.class);
 
         crud.getGrid().setColumns("submissionDate", "accountNumber", "amount", "numberOfInstallments",
@@ -40,22 +47,29 @@ public class SubmissionView extends VerticalLayout {
 
         crud.getCrudFormFactory().setFieldCaptions(CrudOperation.UPDATE, "Approve");
 
-        crud.setFindAllOperation(() -> creditService.findAllBySubmissionApproved(false));
-        crud.setUpdateOperation(credit -> {
-            Submission submission = submissionService.findById(credit.getSubmission().getId()).get();
-            Account account = accountService.findById(credit.getAccount().getId()).get();
+        crud.setFindAllOperation(() -> creditService.findAllBySubmissionApproved(approved));
 
-            submission.setApproved(credit.getSubmission().getApproved());
-            Long newAccountBalance = Long.parseLong(account.getAccountBalance()) + credit.getAmount();
+        if (approved) {
+            crud.setUpdateOperationVisible(false);
+        }
+        else {
+            crud.setUpdateOperation(credit -> {
+                Submission submission = submissionService.findById(credit.getSubmission().getId()).get();
+                Account account = accountService.findById(credit.getAccount().getId()).get();
 
-            account.setAccountBalance(Long.toString(newAccountBalance));
+                submission.setApproved(credit.getSubmission().getApproved());
+                Long newAccountBalance = Long.parseLong(account.getAccountBalance()) + credit.getAmount();
 
-            accountService.save(account);
-            submissionService.save(submission);
-            Notification.show("Submission approved");
+                account.setAccountBalance(Long.toString(newAccountBalance));
+                accountService.save(account);
 
-            return credit;
-        });
+                submissionService.save(submission);
+                Notification.show("Submission approved");
+
+                return credit;
+            });
+        }
+
 
         crud.getGrid().getColumns().forEach(col -> col.setAutoWidth(true));
 
@@ -65,6 +79,30 @@ public class SubmissionView extends VerticalLayout {
         crud.setDeleteOperationVisible(false);
 
         setSizeFull();
-        add(crud);
+        return crud;
+    }
+
+    public void createTabs() {
+        Tab unapprovedTab = new Tab("Unapproved");
+        Tab approvedTab = new Tab("Approved");
+
+        GridCrud<Credit> unapprovedGrid = createGrid(false);
+        GridCrud<Credit> approvedGrid = createGrid(true);
+        approvedGrid.setVisible(false);
+
+        Map<Tab, Component> tabsToPages = new HashMap<>();
+        tabsToPages.put(unapprovedTab, unapprovedGrid);
+        tabsToPages.put(approvedTab, approvedGrid);
+        Tabs tabs = new Tabs(unapprovedTab, approvedTab);
+        Div pages = new Div(unapprovedGrid, approvedGrid);
+        pages.setSizeFull();
+
+        tabs.addSelectedChangeListener(event -> {
+            tabsToPages.values().forEach(page -> page.setVisible(false));
+            Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+            selectedPage.setVisible(true);
+        });
+
+        add(tabs, pages);
     }
 }
