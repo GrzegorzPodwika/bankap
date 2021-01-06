@@ -18,8 +18,8 @@ import com.vaadin.flow.router.Route;
 import org.vaadin.crudui.crud.CrudOperation;
 import org.vaadin.crudui.crud.impl.GridCrud;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Route(value = "submission", layout = MainView.class)
 @PageTitle("Submission | BankAP")
@@ -43,7 +43,7 @@ public class SubmissionView extends VerticalLayout {
                 "begin", "end", "submissionApproved");
 
         crud.getCrudFormFactory().setUseBeanValidation(true);
-        crud.getCrudFormFactory().setVisibleProperties(CrudOperation.UPDATE,  "submissionApproved");
+        crud.getCrudFormFactory().setVisibleProperties(CrudOperation.UPDATE, "submissionApproved");
 
         crud.getCrudFormFactory().setFieldCaptions(CrudOperation.UPDATE, "Approve");
 
@@ -51,8 +51,7 @@ public class SubmissionView extends VerticalLayout {
 
         if (approved) {
             crud.setUpdateOperationVisible(false);
-        }
-        else {
+        } else {
             crud.setUpdateOperation(credit -> {
                 Submission submission = submissionService.findById(credit.getSubmission().getId()).get();
                 Account account = accountService.findById(credit.getAccount().getId()).get();
