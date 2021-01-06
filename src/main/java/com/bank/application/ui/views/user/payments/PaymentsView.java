@@ -102,6 +102,8 @@ public class PaymentsView extends VerticalLayout {
             }
         });
 
+        crud.getGrid().getColumns().forEach(col -> col.setAutoWidth(true));
+
         crud.setFindAllOperationVisible(false);
         crud.setUpdateOperationVisible(false);
         crud.setDeleteOperationVisible(false);
