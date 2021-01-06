@@ -2,7 +2,6 @@ package com.bank.application.backend.service;
 
 import com.bank.application.backend.entity.Account;
 import com.bank.application.backend.entity.Credit;
-import com.bank.application.backend.entity.CreditCard;
 import com.bank.application.backend.repository.CreditRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,9 +25,19 @@ public class CreditService {
         return creditRepository.findAllCredits(account);
     }
 
+    public List<Credit> findAllCredits() {
+        return creditRepository.findAll();
+    }
+
     public void delete(Credit credit) {
         creditRepository.delete(credit);
     }
 
-    public void save(Credit credit) { creditRepository.save(credit); }
+    public void save(Credit credit) {
+        creditRepository.save(credit);
+    }
+
+    public List<Credit> findAllBySubmissionApproved(Boolean submissionApproved) {
+        return creditRepository.findAllBySubmissionApproved(submissionApproved);
+    }
 }

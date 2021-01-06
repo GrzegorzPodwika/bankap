@@ -2,8 +2,10 @@ package com.bank.application.ui.views.user.credit;
 
 import com.bank.application.backend.entity.Account;
 import com.bank.application.backend.entity.Credit;
+import com.bank.application.backend.entity.Submission;
 import com.bank.application.backend.entity.User;
 import com.bank.application.backend.service.CreditService;
+import com.bank.application.backend.service.SubmissionService;
 import com.bank.application.backend.service.UserService;
 import com.bank.application.other.Constants;
 import com.bank.application.ui.views.main.MainView;
@@ -26,19 +28,27 @@ public class CreditView extends Div {
     private User activeUser;
     private final CreditService creditService;
     private final UserService userService;
+    private final SubmissionService submissionService;
 
 
-    public CreditView(CreditService creditService, UserService userService) {
-        setId("credit-view");
+    public CreditView(CreditService creditService, UserService userService, SubmissionService submissionService) {
+        this.submissionService = submissionService;
         this.userService = userService;
         this.creditService = creditService;
 
+        setId("credit-view");
+
         fetchActiveUser();
 
+        createGrid();
+    }
+
+
+    public void createGrid() {
         GridCrud<Credit> crud = new GridCrud<>(Credit.class);
 
-        crud.getGrid().setColumns("amount", "numberOfInstallments", "begin", "end");
-        crud.getGrid().setColumnReorderingAllowed(true);
+        crud.getGrid().setColumns("amount", "numberOfInstallments", "begin", "end", "submissionApproved");
+
         crud.getCrudFormFactory().setUseBeanValidation(true);
         crud.getCrudFormFactory().setVisibleProperties(CrudOperation.ADD, "amount", "numberOfInstallments",
                 "begin", "end");
@@ -48,13 +58,17 @@ public class CreditView extends Div {
         crud.setAddOperation(creditForm -> {
             Credit credit = new Credit();
             Account account = activeUser.getAccount();
+            Submission submission = new Submission();
+            submission.setAccount(account);
 
             credit.setAmount(creditForm.getAmount());
             credit.setNumberOfInstallments(creditForm.getNumberOfInstallments());
             credit.setBegin(creditForm.getBegin());
             credit.setEnd(creditForm.getEnd());
             credit.setAccount(account);
+            credit.setSubmission(submission);
 
+            submissionService.save(submission);
             creditService.save(credit);
 
             Notification.show("Pomyślnie utworzono kredyt!", 3000, Notification.Position.MIDDLE);
