@@ -1,14 +1,27 @@
 package com.bank.application.backend.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 public class Credit extends ItemClass {
 
-    private String begin;
-    private String end;
-    private int amount;
+    private long amount;
     private int numberOfInstallments;
+    private double monthlyInstallment;
+
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    private LocalDate beginDate;
+
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    private LocalDate endDate;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "account_id")
@@ -19,31 +32,13 @@ public class Credit extends ItemClass {
     private Submission submission;
 
     @Transient
-    private String accountNumber;
+    private boolean submissionApproved;
 
-    public String getAccountNumber() {
-        return account.getAccountNumber();
-    }
-
-    @Transient
-    private String submissionDate;
-
-    public String getSubmissionDate() {
-        return submission.getDate();
-    }
-
-    public void setSubmissionDate(String submissionDate) {
-        submission.setDate(submissionDate);
-    }
-
-    @Transient
-    private Boolean submissionApproved;
-
-    public Boolean getSubmissionApproved() {
+    public boolean getSubmissionApproved() {
         return submission.getApproved();
     }
 
-    public void setSubmissionApproved(Boolean submissionApproved) {
+    public void setSubmissionApproved(boolean submissionApproved) {
         submission.setApproved(submissionApproved);
     }
 
@@ -51,9 +46,9 @@ public class Credit extends ItemClass {
 
     }
 
-    public Credit(String begin, String end, int amount, int numberOfInstallments) {
-        this.begin = begin;
-        this.end = end;
+    public Credit(LocalDate beginDate, LocalDate endDate, int amount, int numberOfInstallments) {
+        this.beginDate = beginDate;
+        this.endDate = endDate;
         this.amount = amount;
         this.numberOfInstallments = numberOfInstallments;
     }
@@ -74,27 +69,27 @@ public class Credit extends ItemClass {
         this.submission = submission;
     }
 
-    public String getBegin() {
-        return begin;
+    public LocalDate getBeginDate() {
+        return beginDate;
     }
 
-    public void setBegin(String begin) {
-        this.begin = begin;
+    public void setBeginDate(LocalDate beginDate) {
+        this.beginDate = beginDate;
     }
 
-    public String getEnd() {
-        return end;
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
-    public void setEnd(String end) {
-        this.end = end;
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
-    public int getAmount() {
+    public long getAmount() {
         return this.amount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(long amount) {
         this.amount = amount;
     }
 
@@ -104,5 +99,13 @@ public class Credit extends ItemClass {
 
     public void setNumberOfInstallments(int numberOfInstallments) {
         this.numberOfInstallments = numberOfInstallments;
+    }
+
+    public double getMonthlyInstallment() {
+        return monthlyInstallment;
+    }
+
+    public void setMonthlyInstallment(double monthlyInstallment) {
+        this.monthlyInstallment = monthlyInstallment;
     }
 }

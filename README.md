@@ -1,17 +1,28 @@
 # BankAP
+ Simple web bank application for studying purposes.
 
-This is an project that simulate bank using Vaadin framework with Spring Boot help.
+# Triggers
 
-## Screenshots
-<p align="left">
-  <img src="./img/img_01.png" width="230">
-  <img src="./img/img_02.png" width="230">
-  <img src="./img/img_03.png" width="230">
-  <img src="./img/img_04.png" width="230">
-  <img src="./img/img_05.png" width="230">
-  <img src="./img/img_06.png" width="230">
-  <img src="./img/img_07.png" width="230">
-  <img src="./img/img_08.png" width="230">
-  <img src="./img/img_09.png" width="230">
-  <img src="./img/img_10.png" width="230">
-</p>
+//SET GLOBAL log_bin_trust_function_creators = 1; with admin privileges firstly
+
+DELIMITER $$  
+Create TRIGGER trigger_after_insert_transaction AFTER INSERT  
+ON transaction  
+FOR EACH ROW  
+BEGIN  
+update account  
+set account_balance = account_balance + NEW.amount  
+WHERE id = NEW.account_id;  
+END$$
+
+DELIMITER ;
+
+DELIMITER $$  
+Create TRIGGER trigger_after_delete_transaction AFTER DELETE  
+ON transaction  
+FOR EACH ROW  
+BEGIN  
+update account  
+set account_balance = account_balance - OLD.amount  
+WHERE id = OLD.account_id;  
+END$$   

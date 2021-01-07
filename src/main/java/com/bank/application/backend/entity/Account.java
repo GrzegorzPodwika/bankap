@@ -10,7 +10,7 @@ import java.util.List;
 public class Account extends ItemClass {
 
     private String accountNumber;
-    private String accountBalance;
+    private double accountBalance;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
@@ -21,7 +21,7 @@ public class Account extends ItemClass {
     }
 
     public Account(String accountNumber) {
-        this.accountBalance = "0";
+        this.accountBalance = 0.0;
         this.accountNumber = accountNumber;
     }
 
@@ -33,11 +33,11 @@ public class Account extends ItemClass {
         this.user = user;
     }
 
-    public String getAccountBalance() {
+    public double getAccountBalance() {
         return accountBalance;
     }
 
-    public void setAccountBalance(String accountBalance) {
+    public void setAccountBalance(double accountBalance) {
         this.accountBalance = accountBalance;
     }
 

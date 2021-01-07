@@ -46,7 +46,6 @@ public class HomeView extends Div {
         fetchFreshUser();
 
         setId("home-view");
-        System.out.println(user);
 
         setUpLayoutWithUserCredentials();
         //createTabs();
@@ -127,10 +126,10 @@ public class HomeView extends Div {
                 numberFieldTopUpAmount.setErrorMessage("Wartość nie może byc 0!");
             } else {
                 if (!textFieldTransactionTitle.getValue().isEmpty()) {
-                    double newBalance = Double.parseDouble(user.getAccount().getAccountBalance()) + numberFieldTopUpAmount.getValue();
+
+                    double newBalance = user.getAccount().getAccountBalance() + numberFieldTopUpAmount.getValue();
                     newBalance =  Math.round(newBalance*100) / 100.0;
                     Account userAccount = user.getAccount();
-                    userAccount.setAccountBalance(Double.toString(newBalance));
 
                     Transaction transaction = new Transaction();
                     transaction.setTransactionTitle(textFieldTransactionTitle.getValue());
@@ -138,7 +137,6 @@ public class HomeView extends Div {
                     transaction.setAmount(numberFieldTopUpAmount.getValue());
                     transaction.setReceiverAccountNumber(userAccount.getAccountNumber());
 
-                    accountService.update(userAccount);
                     transactionService.save(transaction);
 
                     balanceH2.setText("Saldo " + newBalance + " PLN");
