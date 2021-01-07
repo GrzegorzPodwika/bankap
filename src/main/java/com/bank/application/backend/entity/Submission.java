@@ -1,47 +1,25 @@
 package com.bank.application.backend.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
 public class Submission extends ItemClass {
 
-    private String date;
+    private LocalDate submissionDate;
     private Boolean isApproved;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "account_id")
-    private Account account;
+    @OneToOne(mappedBy = "submission", cascade = CascadeType.ALL)
+    private Credit credit;
 
     public Submission() {
-        LocalDate localDate = LocalDate.now();
-        this.date = localDate.toString();
+        this.submissionDate = LocalDate.now();
         this.isApproved = false;
     }
 
-    public Submission(String date) {
-        this.date = date;
+    public Submission(LocalDate submissionDate) {
+        this.submissionDate = submissionDate;
         this.isApproved = false;
-    }
-
-
-    public Account getAccount() {
-        return account;
-    }
-
-    public void setAccount(Account account) {
-        this.account = account;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
     }
 
     public Boolean getApproved() {
@@ -50,5 +28,21 @@ public class Submission extends ItemClass {
 
     public void setApproved(Boolean approved) {
         isApproved = approved;
+    }
+
+    public LocalDate getSubmissionDate() {
+        return submissionDate;
+    }
+
+    public void setSubmissionDate(LocalDate submissionDate) {
+        this.submissionDate = submissionDate;
+    }
+
+    public Credit getCredit() {
+        return credit;
+    }
+
+    public void setCredit(Credit credit) {
+        this.credit = credit;
     }
 }

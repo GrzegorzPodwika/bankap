@@ -85,7 +85,6 @@ public class PaymentsView extends VerticalLayout {
                     receiverTransaction.setReceiverAccountNumber(transaction.getReceiverAccountNumber());
                     receiverTransaction.setAccount(receiverAccount);
 
-                    updateBalanceInSenderAndReceiverAccounts(senderAccount, receiverAccount, transferAmountPositive);
                     transactionService.add(transaction, receiverTransaction);
 
                     fetchTransactions();
@@ -163,10 +162,6 @@ public class PaymentsView extends VerticalLayout {
         PdfWriter.getInstance(document, new FileOutputStream("statement.pdf"));
         document.open();
 
-/*        Font font = FontFactory.getFont(FontFactory.COURIER, 12, BaseColor.BLACK);
-        Chunk chunk = new Chunk("Hello World", font);
-        document.add(chunk);*/
-
         PdfPTable pdfPTable = new PdfPTable(5);
         pdfPTable.setWidthPercentage(100f);
         addTableHeader(pdfPTable);
@@ -198,26 +193,11 @@ public class PaymentsView extends VerticalLayout {
     }
 
     private boolean hasUserEnoughMoney(Transaction transaction) {
-        return Double.parseDouble(activeUser.getAccount().getAccountBalance()) >= transaction.getAmount();
+        return activeUser.getAccount().getAccountBalance() >= transaction.getAmount();
     }
 
     private boolean isTransactionCorrect(Transaction transaction) {
         return transaction.getTransactionTitle() != null && !transaction.getTransactionTitle().isEmpty() && transaction.getAmount() != 0.0;
     }
-
-    private void updateBalanceInSenderAndReceiverAccounts(Account senderAccount, Account receiverAccount, double transferAmount) {
-
-        double newBalanceSender = Double.parseDouble(senderAccount.getAccountBalance()) - transferAmount;
-        newBalanceSender = Math.round(newBalanceSender * 100) / 100.0;
-        senderAccount.setAccountBalance(Double.toString(newBalanceSender));
-
-        double newBalanceReceiver = Double.parseDouble(receiverAccount.getAccountBalance()) + transferAmount;
-        newBalanceReceiver = Math.round(newBalanceReceiver * 100) / 100.0;
-        receiverAccount.setAccountBalance(Double.toString(newBalanceReceiver));
-
-        accountService.update(senderAccount);
-        accountService.update(receiverAccount);
-    }
-
 
 }

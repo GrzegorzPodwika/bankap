@@ -40,4 +40,8 @@ public class CreditService {
     public List<Credit> findAllBySubmissionApproved(Boolean submissionApproved) {
         return creditRepository.findAllBySubmissionApproved(submissionApproved);
     }
+
+    public void update(Credit credit) {
+        creditRepository.save(credit);
+    }
 }

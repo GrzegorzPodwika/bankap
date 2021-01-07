@@ -1,11 +1,10 @@
 package com.bank.application.ui.views.employee;
 
-import com.bank.application.backend.entity.Account;
 import com.bank.application.backend.entity.Credit;
-import com.bank.application.backend.entity.Submission;
-import com.bank.application.backend.service.AccountService;
+import com.bank.application.backend.entity.Transaction;
 import com.bank.application.backend.service.CreditService;
 import com.bank.application.backend.service.SubmissionService;
+import com.bank.application.backend.service.TransactionService;
 import com.bank.application.ui.views.main.MainView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.html.Div;
@@ -19,66 +18,20 @@ import org.vaadin.crudui.crud.CrudOperation;
 import org.vaadin.crudui.crud.impl.GridCrud;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @Route(value = "submission", layout = MainView.class)
 @PageTitle("Submission | BankAP")
 public class SubmissionView extends VerticalLayout {
     private final CreditService creditService;
     private final SubmissionService submissionService;
-    private final AccountService accountService;
+    private final TransactionService transactionService;
 
-    public SubmissionView(CreditService creditService, SubmissionService submissionService, AccountService accountService) {
+    public SubmissionView(CreditService creditService, SubmissionService submissionService, TransactionService transactionService) {
         this.creditService = creditService;
         this.submissionService = submissionService;
-        this.accountService = accountService;
+        this.transactionService = transactionService;
 
         createTabs();
-    }
-
-    public GridCrud<Credit> createGrid(Boolean approved) {
-        GridCrud<Credit> crud = new GridCrud<>(Credit.class);
-
-        crud.getGrid().setColumns("submissionDate", "accountNumber", "amount", "numberOfInstallments",
-                "begin", "end", "submissionApproved");
-
-        crud.getCrudFormFactory().setUseBeanValidation(true);
-        crud.getCrudFormFactory().setVisibleProperties(CrudOperation.UPDATE, "submissionApproved");
-
-        crud.getCrudFormFactory().setFieldCaptions(CrudOperation.UPDATE, "Approve");
-
-        crud.setFindAllOperation(() -> creditService.findAllBySubmissionApproved(approved));
-
-        if (approved) {
-            crud.setUpdateOperationVisible(false);
-        } else {
-            crud.setUpdateOperation(credit -> {
-                Submission submission = submissionService.findById(credit.getSubmission().getId()).get();
-                Account account = accountService.findById(credit.getAccount().getId()).get();
-
-                submission.setApproved(credit.getSubmission().getApproved());
-                Long newAccountBalance = Long.parseLong(account.getAccountBalance()) + credit.getAmount();
-
-                account.setAccountBalance(Long.toString(newAccountBalance));
-                accountService.save(account);
-
-                submissionService.save(submission);
-                Notification.show("Submission approved");
-
-                return credit;
-            });
-        }
-
-
-        crud.getGrid().getColumns().forEach(col -> col.setAutoWidth(true));
-
-        crud.setShowNotifications(false);
-
-        crud.setAddOperationVisible(false);
-        crud.setDeleteOperationVisible(false);
-
-        setSizeFull();
-        return crud;
     }
 
     public void createTabs() {
@@ -103,5 +56,57 @@ public class SubmissionView extends VerticalLayout {
         });
 
         add(tabs, pages);
+    }
+
+    public GridCrud<Credit> createGrid(Boolean approved) {
+        GridCrud<Credit> crud = new GridCrud<>(Credit.class);
+
+        crud.getGrid().setColumns("account", "amount", "numberOfInstallments",
+                "beginDate", "endDate", "submissionApproved");
+
+        crud.getCrudFormFactory().setUseBeanValidation(true);
+        crud.getCrudFormFactory().setVisibleProperties(CrudOperation.UPDATE, "submissionApproved");
+        crud.getCrudFormFactory().setFieldCaptions(CrudOperation.UPDATE, "Approve");
+
+        crud.setFindAllOperation(() -> creditService.findAllBySubmissionApproved(approved));
+
+        if (approved) {
+            crud.setUpdateOperationVisible(false);
+        } else {
+            crud.setUpdateOperation(credit -> {
+                boolean isApproved = credit.getSubmission().getApproved();
+                if(isApproved) {
+                    submissionService.save(credit.getSubmission());
+                    transferCreditAmountToClient(credit);
+                    Notification.show("Submission approved");
+                } else {
+                    Notification.show("Submission not approved");
+                    return null;
+                }
+
+                return credit;
+            });
+        }
+
+
+        crud.getGrid().getColumns().forEach(col -> col.setAutoWidth(true));
+
+        crud.setShowNotifications(false);
+
+        crud.setAddOperationVisible(false);
+        crud.setDeleteOperationVisible(false);
+
+        setSizeFull();
+        return crud;
+    }
+
+    private void transferCreditAmountToClient(Credit credit) {
+        Transaction transaction = new Transaction();
+        transaction.setTransactionTitle("Kredyt na sumę = " + credit.getAmount());
+        transaction.setAmount(credit.getAmount());
+        transaction.setAccount(credit.getAccount());
+        transaction.setReceiverAccountNumber(credit.getAccount().getAccountNumber());
+
+        transactionService.save(transaction);
     }
 }

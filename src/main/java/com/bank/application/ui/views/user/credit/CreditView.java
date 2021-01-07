@@ -8,6 +8,8 @@ import com.bank.application.backend.service.CreditService;
 import com.bank.application.backend.service.SubmissionService;
 import com.bank.application.backend.service.UserService;
 import com.bank.application.other.Constants;
+import com.bank.application.ui.views.home.HomeView;
+import com.bank.application.ui.views.home.HomeView.UserNotFoundException;
 import com.bank.application.ui.views.main.MainView;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
@@ -20,6 +22,7 @@ import org.vaadin.crudui.crud.impl.GridCrud;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -48,127 +51,85 @@ public class CreditView extends Div {
         createGrid();
     }
 
+    private void fetchActiveUser() {
+        try {
+            fetchUserById();
+        } catch (UserNotFoundException e) {
+            System.out.println("User has not been found!");
+        }
+    }
+
+    private void fetchUserById() throws UserNotFoundException {
+        Integer userId = (Integer) VaadinSession.getCurrent().getAttribute(Constants.USER_ID);
+        Optional<User> fetchedUpdatedUser = userService.findUserById(userId);
+        if (fetchedUpdatedUser.isPresent()) {
+            activeUser = fetchedUpdatedUser.get();
+        } else {
+            throw new UserNotFoundException();
+        }
+    }
+
 
     public void createGrid() {
         GridCrud<Credit> crud = new GridCrud<>(Credit.class);
 
-        crud.getGrid().setColumns("amount", "numberOfInstallments", "begin", "end", "submissionApproved");
+        crud.getGrid().setColumns("amount", "numberOfInstallments", "beginDate", "endDate", "submissionApproved");
 
         crud.getCrudFormFactory().setUseBeanValidation(true);
-        crud.getCrudFormFactory().setVisibleProperties(CrudOperation.ADD, "amount", "numberOfInstallments",
-                "begin", "end");
+        crud.getCrudFormFactory().setVisibleProperties(CrudOperation.ADD,
+                "amount", "numberOfInstallments", "beginDate");
 
         crud.setFindAllOperation(() -> creditService.findAllByAccount(activeUser.getAccount()));
 
         crud.setAddOperation(creditForm -> {
-            Credit credit = new Credit();
-            Account account = activeUser.getAccount();
-            Submission submission = new Submission();
-            submission.setAccount(account);
 
-            credit.setAmount(creditForm.getAmount());
-            credit.setNumberOfInstallments(creditForm.getNumberOfInstallments());
-            credit.setBegin(creditForm.getBegin());
-            credit.setEnd(creditForm.getEnd());
-            credit.setAccount(account);
-            credit.setSubmission(submission);
-
-            if (credit.getBegin() == null || credit.getEnd() == null) {
-                Notification.show("Begin and end date cannot be empty!");
+            if (creditForm.getNumberOfInstallments() == 0) {
+                Notification.show("Liczba rat nie może być równa zero!");
                 return null;
-            }
-
-            Pattern compiledPattern = Pattern.compile("^(19|20)\\d\\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$");
-            Matcher matcherBegin = compiledPattern.matcher(credit.getBegin());
-            Matcher matcherEnd = compiledPattern.matcher(credit.getEnd());
-
-            if(! matcherBegin.matches() || ! matcherEnd.matches()) {
-                Notification.show("Incorrect date format! Enter date like yyyy-mm-dd");
+            } else if(creditForm.getAmount() == 0) {
+                Notification.show("Wartość kredytu nie może być równa zero!");
                 return null;
+            } else if(creditForm.getBeginDate() == null) {
+                Notification.show("Wybierz datę początku kredytu!");
+                return null;
+            } else {
+                Account account = activeUser.getAccount();
+                Submission submission = new Submission();
+
+                Credit credit = new Credit();
+                credit.setAmount(creditForm.getAmount());
+                credit.setNumberOfInstallments(creditForm.getNumberOfInstallments());
+                credit.setMonthlyInstallment((double)creditForm.getAmount()/ creditForm.getNumberOfInstallments());
+                credit.setBeginDate(creditForm.getBeginDate());
+                credit.setEndDate(calculateEndDate(creditForm));
+                credit.setAccount(account);
+                credit.setSubmission(submission);
+
+                submission.setCredit(credit);
+
+                submissionService.save(submission);
+                creditService.save(credit);
+
+                Notification.show("Pomyślnie utworzono kredyt!", 3000, Notification.Position.MIDDLE);
+                return credit;
             }
-
-
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
-            try {
-                Date beginDate = simpleDateFormat.parse(credit.getBegin());
-                Date endDate = simpleDateFormat.parse(credit.getEnd());
-
-                if(computeDiff(beginDate, endDate).get(TimeUnit.DAYS) < credit.getNumberOfInstallments() * 30) {
-                    Notification.show("The time interval between start date and end date must be at least equal " +
-                            "(number of installments> = number of months)");
-
-                    System.out.println(credit.getBegin() + " " + credit.getEnd());
-                    System.out.println(computeDiff(beginDate, endDate).get(TimeUnit.DAYS) + " " + credit.getNumberOfInstallments() * 30);
-                    return null;
-                }
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-
-            submissionService.save(submission);
-            creditService.save(credit);
-
-            Notification.show("Pomyślnie utworzono kredyt!", 3000, Notification.Position.MIDDLE);
-            return credit;
         });
 
         crud.setShowNotifications(false);
 
         crud.setFindAllOperationVisible(false);
         crud.setUpdateOperationVisible(false);
-        crud.getCrudFormFactory().setVisibleProperties(CrudOperation.DELETE, "amount", "numberOfInstallments",
+        crud.setDeleteOperationVisible(false);
+/*        crud.getCrudFormFactory().setVisibleProperties(CrudOperation.DELETE, "amount", "numberOfInstallments",
                 "begin", "end");
-        crud.setDeleteOperation(creditService::delete);
+        crud.setDeleteOperation(creditService::delete);*/
 
         setSizeFull();
         add(crud);
     }
 
-    public static Map<TimeUnit, Long> computeDiff(Date date1, Date date2) {
-
-        long diffInMillies = date2.getTime() - date1.getTime();
-
-        List<TimeUnit> units = new ArrayList<TimeUnit>(EnumSet.allOf(TimeUnit.class));
-        Collections.reverse(units);
-
-        // create the result map of TimeUnit and difference
-        Map<TimeUnit, Long> result = new LinkedHashMap<TimeUnit, Long>();
-        long milliesRest = diffInMillies;
-
-        for (TimeUnit unit : units) {
-
-            // calculate difference in millisecond
-            long diff = unit.convert(milliesRest, TimeUnit.MILLISECONDS);
-            long diffInMilliesForUnit = unit.toMillis(diff);
-            milliesRest = milliesRest - diffInMilliesForUnit;
-
-            // put the result in the map
-            result.put(unit, diff);
-        }
-
-        return result;
+    private LocalDate calculateEndDate(Credit creditForm) {
+        return creditForm.getBeginDate().plusMonths(creditForm.getNumberOfInstallments());
     }
 
-    private void fetchActiveUser() {
-        try {
-            fetchUserById();
-        } catch (com.bank.application.ui.views.user.cards.CardsView.UserNotFoundException e) {
-            System.out.println("User has not been found!");
-        }
-    }
-
-    private void fetchUserById() throws com.bank.application.ui.views.user.cards.CardsView.UserNotFoundException {
-        Integer userId = (Integer) VaadinSession.getCurrent().getAttribute(Constants.USER_ID);
-        Optional<User> fetchedUpdatedUser = userService.findUserById(userId);
-        if (fetchedUpdatedUser.isPresent()) {
-            activeUser = fetchedUpdatedUser.get();
-        } else {
-            throw new com.bank.application.ui.views.user.cards.CardsView.UserNotFoundException();
-        }
-    }
-
-    public static class UserNotFoundException extends Exception {
-
-    }
 }
