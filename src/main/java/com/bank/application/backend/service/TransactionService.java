@@ -7,10 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
-public class TransactionService {
+public class TransactionService implements Dao<Transaction>{
     private final TransactionRepository repo;
 
     @Autowired
@@ -18,29 +19,29 @@ public class TransactionService {
         this.repo = transactionRepository;
     }
 
-    public TransactionRepository getRepo() {
-        return repo;
+    @Override
+    public Transaction save(Transaction transaction) {
+        return repo.save(transaction);
     }
 
-
-    public List<Transaction> findAll() {
-        return repo.findAll();
-    }
-
-
-    public void add(Transaction transactionFromSender, Transaction transactionForReceiver) {
-        repo.save(transactionFromSender);
-        repo.save(transactionForReceiver);
-    }
-
-
+    @Override
     public Transaction update(Transaction transaction) {
         return repo.save(transaction);
     }
 
-
+    @Override
     public void delete(Transaction transaction) {
         repo.delete(transaction);
+    }
+
+    @Override
+    public Optional<Transaction> get(Integer id) {
+        return repo.findById(id);
+    }
+
+    @Override
+    public List<Transaction> getAll() {
+        return repo.findAll();
     }
 
     public List<Transaction> findAllByAccount(Account account) {
@@ -49,10 +50,6 @@ public class TransactionService {
 
     public List<Transaction> findAllByTimestamp() {
         return repo.findAllByOrderByTimestampDesc();
-    }
-
-    public void save(Transaction transaction) {
-        repo.save(transaction);
     }
 
     public Transaction findByAccountAndTitle(Account receiverAccount, String transactionTitle) {

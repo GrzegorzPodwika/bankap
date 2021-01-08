@@ -11,18 +11,23 @@ public class Account extends ItemClass {
 
     private String accountNumber;
     private double accountBalance;
+    private int numberOfCreditCards;
+    private int numberOfCredits;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
 
     public Account() {
-
+        this.numberOfCredits = 0;
+        this.numberOfCreditCards = 0;
     }
 
     public Account(String accountNumber) {
         this.accountBalance = 0.0;
         this.accountNumber = accountNumber;
+        this.numberOfCredits = 0;
+        this.numberOfCreditCards = 0;
     }
 
     public User getUser() {
@@ -49,6 +54,29 @@ public class Account extends ItemClass {
         this.accountNumber = accountNumber;
     }
 
+    public int getNumberOfCreditCards() {
+        return numberOfCreditCards;
+    }
+
+    public void incrementNumberOfCreditCards() {
+        this.numberOfCreditCards += 1;
+    }
+
+    public void setNumberOfCreditCards(int numberOfCreditCards) {
+        this.numberOfCreditCards = numberOfCreditCards;
+    }
+
+    public int getNumberOfCredits() {
+        return numberOfCredits;
+    }
+
+    public void incrementNumberOfCredits() {
+        this.numberOfCredits += 1;
+    }
+
+    public void setNumberOfCredits(int numberOfCredits) {
+        this.numberOfCredits = numberOfCredits;
+    }
 
     @Override
     public String toString() {

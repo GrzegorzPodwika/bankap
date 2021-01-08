@@ -85,7 +85,8 @@ public class PaymentsView extends VerticalLayout {
                     receiverTransaction.setReceiverAccountNumber(transaction.getReceiverAccountNumber());
                     receiverTransaction.setAccount(receiverAccount);
 
-                    transactionService.add(transaction, receiverTransaction);
+                    transactionService.save(transaction);
+                    transactionService.save(receiverTransaction);
 
                     fetchTransactions();
 
@@ -144,7 +145,7 @@ public class PaymentsView extends VerticalLayout {
 
     private void fetchUserById() throws UserNotFoundException {
         Integer userId = (Integer) VaadinSession.getCurrent().getAttribute(Constants.USER_ID);
-        Optional<User> fetchedUpdatedUser = userService.findUserById(userId);
+        Optional<User> fetchedUpdatedUser = userService.get(userId);
         if (fetchedUpdatedUser.isPresent()) {
             activeUser = fetchedUpdatedUser.get();
         } else {

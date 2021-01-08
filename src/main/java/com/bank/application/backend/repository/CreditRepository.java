@@ -13,8 +13,6 @@ public interface CreditRepository extends JpaRepository<Credit, Integer> {
     @Query(value = "SELECT c FROM Credit c WHERE account = ?1")
     List<Credit> findAllCredits(Account account);
 
-    List<Credit> findAll();
-
     @Query(value = "SELECT c FROM Credit c WHERE c.submission.isApproved = ?1")
     List<Credit> findAllBySubmissionApproved(Boolean submissionApproved);
 }
