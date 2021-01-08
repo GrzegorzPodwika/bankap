@@ -14,4 +14,7 @@ import java.util.List;
 public interface CreditCardRepository extends JpaRepository<CreditCard, Integer> {
     @Query(value = "SELECT c FROM CreditCard c WHERE account = ?1")
     List<CreditCard> findAllCreditCards(Account account);
+
+    @Query(value = "SELECT c from CreditCard c WHERE c.submission.isApproved = ?1")
+    List<CreditCard> findAllBySubmissionApproved(boolean submissionApproved);
 }

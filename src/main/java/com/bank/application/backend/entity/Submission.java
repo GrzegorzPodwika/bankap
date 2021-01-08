@@ -9,9 +9,6 @@ public class Submission extends ItemClass {
     private LocalDate submissionDate;
     private Boolean isApproved;
 
-    @OneToOne(mappedBy = "submission", cascade = CascadeType.ALL)
-    private Credit credit;
-
     public Submission() {
         this.submissionDate = LocalDate.now();
         this.isApproved = false;
@@ -38,11 +35,4 @@ public class Submission extends ItemClass {
         this.submissionDate = submissionDate;
     }
 
-    public Credit getCredit() {
-        return credit;
-    }
-
-    public void setCredit(Credit credit) {
-        this.credit = credit;
-    }
 }

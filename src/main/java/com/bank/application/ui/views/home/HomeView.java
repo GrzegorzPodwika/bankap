@@ -170,7 +170,7 @@ public class HomeView extends Div {
 
     private void fetchUserById() throws UserNotFoundException {
         Integer userId = (Integer) VaadinSession.getCurrent().getAttribute(Constants.USER_ID);
-        Optional<User> fetchedUpdatedUser = userService.findUserById(userId);
+        Optional<User> fetchedUpdatedUser = userService.get(userId);
         if (fetchedUpdatedUser.isPresent()) {
             user = fetchedUpdatedUser.get();
         } else {

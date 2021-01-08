@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
-public class CreditService {
+public class CreditService implements Dao<Credit>{
+
     @Autowired
     private final CreditRepository creditRepository;
 
@@ -17,31 +19,36 @@ public class CreditService {
         this.creditRepository = creditRepository;
     }
 
-    public CreditRepository getCreditRepository() {
-        return creditRepository;
+    @Override
+    public Credit save(Credit credit) {
+        return creditRepository.save(credit);
     }
 
-    public List<Credit> findAllByAccount(Account account) {
-        return creditRepository.findAllCredits(account);
+    @Override
+    public Credit update(Credit credit) {
+        return creditRepository.save(credit);
     }
 
-    public List<Credit> findAllCredits() {
-        return creditRepository.findAll();
-    }
-
+    @Override
     public void delete(Credit credit) {
         creditRepository.delete(credit);
     }
 
-    public void save(Credit credit) {
-        creditRepository.save(credit);
+    @Override
+    public Optional<Credit> get(Integer id) {
+        return creditRepository.findById(id);
+    }
+
+    @Override
+    public List<Credit> getAll() {
+        return creditRepository.findAll();
     }
 
     public List<Credit> findAllBySubmissionApproved(Boolean submissionApproved) {
         return creditRepository.findAllBySubmissionApproved(submissionApproved);
     }
 
-    public void update(Credit credit) {
-        creditRepository.save(credit);
+    public List<Credit> findAllByAccount(Account account) {
+        return creditRepository.findAllCredits(account);
     }
 }

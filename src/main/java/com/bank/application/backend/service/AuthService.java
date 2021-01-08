@@ -5,10 +5,12 @@ import com.bank.application.backend.entity.Role;
 import com.bank.application.backend.entity.User;
 import com.bank.application.backend.repository.AccountRepository;
 import com.bank.application.backend.repository.UserRepository;
+import com.bank.application.other.BankUtils;
 import com.bank.application.other.Constants;
 import com.bank.application.ui.views.admin.AdminView;
 import com.bank.application.ui.views.credentials.CredentialsView;
-import com.bank.application.ui.views.employee.SubmissionView;
+import com.bank.application.ui.views.employee.ManageCreditCardsView;
+import com.bank.application.ui.views.employee.ManageCreditsView;
 import com.bank.application.ui.views.user.cards.CardsView;
 import com.bank.application.ui.views.user.credit.CreditView;
 import com.bank.application.ui.views.employee.EmployeeView;
@@ -30,7 +32,6 @@ public class AuthService {
     @Autowired
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
-    private VaadinSession session;
 
     public AuthService(@Autowired UserRepository userRepository, AccountRepository accountRepository) {
         this.userRepository = userRepository;
@@ -67,8 +68,8 @@ public class AuthService {
             routes.add(new AuthorizedRoute("home", "Home", HomeView.class));
             routes.add(new AuthorizedRoute("credentials", "Credentials", CredentialsView.class));
             routes.add(new AuthorizedRoute("managePayments", "ManagePayments", ManagePaymentsEmployeeView.class));
-            routes.add(new AuthorizedRoute("employee", "Employee", EmployeeView.class));
-            routes.add(new AuthorizedRoute("submission", "Submission", SubmissionView.class));
+            routes.add(new AuthorizedRoute("manageCredits", "ManageCredits", ManageCreditsView.class));
+            routes.add(new AuthorizedRoute("manageCreditCards", "ManageCreditCards", ManageCreditCardsView.class));
         } else if (role == Role.ADMIN) {
             routes.add(new AuthorizedRoute("home", "Home", HomeView.class));
             routes.add(new AuthorizedRoute("credentials", "Credentials", CredentialsView.class));
@@ -81,7 +82,7 @@ public class AuthService {
 
     public void register(String username, String password, String firstName, String lastName,
                          String pesel, String address, String email, String phone, String birthDate) {
-        Account account = new Account(generateRandomAccountNumber());
+        Account account = new Account(BankUtils.generateRandomAccountNumber());
         User user = new User(username, password, Role.USER, firstName, lastName, pesel, address, email, phone, birthDate);
 
         user.setAccount(account);
@@ -91,9 +92,6 @@ public class AuthService {
         accountRepository.save(account);
     }
 
-    public String getCurrentUserName() {
-        return VaadinSession.getCurrent().getAttribute(User.class).getUsername();
-    }
 
     public static class AuthorizedRoute {
         private final String route;
@@ -120,18 +118,5 @@ public class AuthService {
     }
 
     public static class AuthException extends Exception {
-    }
-
-    public String generateRandomAccountNumber() {
-        int min = 0;
-        int max = 9;
-        String accountNumber = "";
-
-        for (int i = 0; i < 26; i++) {
-            int randomNum = (int)(Math.random() * (max - min + 1) + min);
-            accountNumber += Integer.toString(randomNum);
-        }
-
-        return accountNumber;
     }
 }

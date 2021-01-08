@@ -121,11 +121,11 @@ public class RegisterView extends Composite {
     }
 
     private TextField createPesel() {
-        TextField id = new TextField("ID");
+        TextField id = new TextField("Pesel");
         id.setPattern("[0-9]*");
         id.setPreventInvalidInput(true);
         id.setMaxLength(11);
-        id.setPlaceholder("Your ID");
+        id.setPlaceholder("Your Pesel");
 
         return id;
     }

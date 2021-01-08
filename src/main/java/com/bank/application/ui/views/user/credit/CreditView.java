@@ -4,11 +4,11 @@ import com.bank.application.backend.entity.Account;
 import com.bank.application.backend.entity.Credit;
 import com.bank.application.backend.entity.Submission;
 import com.bank.application.backend.entity.User;
+import com.bank.application.backend.service.AccountService;
 import com.bank.application.backend.service.CreditService;
 import com.bank.application.backend.service.SubmissionService;
 import com.bank.application.backend.service.UserService;
 import com.bank.application.other.Constants;
-import com.bank.application.ui.views.home.HomeView;
 import com.bank.application.ui.views.home.HomeView.UserNotFoundException;
 import com.bank.application.ui.views.main.MainView;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -20,13 +20,10 @@ import com.vaadin.flow.server.VaadinSession;
 import org.vaadin.crudui.crud.CrudOperation;
 import org.vaadin.crudui.crud.impl.GridCrud;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static com.bank.application.other.Constants.MAX_NUMBER_OF_CREDITS;
 
 @Route(value = "credits", layout = MainView.class)
 @PageTitle("Credits | BankAP")
@@ -37,12 +34,15 @@ public class CreditView extends Div {
     private final CreditService creditService;
     private final UserService userService;
     private final SubmissionService submissionService;
+    private final AccountService accountService;
+    private GridCrud<Credit> crud;
 
 
-    public CreditView(CreditService creditService, UserService userService, SubmissionService submissionService) {
+    public CreditView(CreditService creditService, UserService userService, SubmissionService submissionService, AccountService accountService) {
         this.submissionService = submissionService;
         this.userService = userService;
         this.creditService = creditService;
+        this.accountService = accountService;
 
         setId("credit-view");
 
@@ -61,7 +61,7 @@ public class CreditView extends Div {
 
     private void fetchUserById() throws UserNotFoundException {
         Integer userId = (Integer) VaadinSession.getCurrent().getAttribute(Constants.USER_ID);
-        Optional<User> fetchedUpdatedUser = userService.findUserById(userId);
+        Optional<User> fetchedUpdatedUser = userService.get(userId);
         if (fetchedUpdatedUser.isPresent()) {
             activeUser = fetchedUpdatedUser.get();
         } else {
@@ -71,7 +71,7 @@ public class CreditView extends Div {
 
 
     public void createGrid() {
-        GridCrud<Credit> crud = new GridCrud<>(Credit.class);
+        crud = new GridCrud<>(Credit.class);
 
         crud.getGrid().setColumns("amount", "numberOfInstallments", "beginDate", "endDate", "submissionApproved");
 
@@ -80,6 +80,7 @@ public class CreditView extends Div {
                 "amount", "numberOfInstallments", "beginDate");
 
         crud.setFindAllOperation(() -> creditService.findAllByAccount(activeUser.getAccount()));
+        checkIfNumberOfCreditsIsMax();
 
         crud.setAddOperation(creditForm -> {
 
@@ -99,16 +100,16 @@ public class CreditView extends Div {
                 Credit credit = new Credit();
                 credit.setAmount(creditForm.getAmount());
                 credit.setNumberOfInstallments(creditForm.getNumberOfInstallments());
-                credit.setMonthlyInstallment((double)creditForm.getAmount()/ creditForm.getNumberOfInstallments());
+                credit.setMonthlyInstallment(calculateNumberOfInstallment(creditForm));
                 credit.setBeginDate(creditForm.getBeginDate());
                 credit.setEndDate(calculateEndDate(creditForm));
                 credit.setAccount(account);
                 credit.setSubmission(submission);
 
-                submission.setCredit(credit);
-
                 submissionService.save(submission);
                 creditService.save(credit);
+                //incrementNumberOfCreditsInClientAccount();
+                checkIfNumberOfCreditsIsMax();
 
                 Notification.show("Pomyślnie utworzono kredyt!", 3000, Notification.Position.MIDDLE);
                 return credit;
@@ -128,8 +129,23 @@ public class CreditView extends Div {
         add(crud);
     }
 
+    private double calculateNumberOfInstallment(Credit creditForm) {
+        return 1.05 * creditForm.getAmount()/ creditForm.getNumberOfInstallments();
+    }
+
     private LocalDate calculateEndDate(Credit creditForm) {
         return creditForm.getBeginDate().plusMonths(creditForm.getNumberOfInstallments());
+    }
+
+/*    private void incrementNumberOfCreditsInClientAccount() {
+        Account account = activeUser.getAccount();
+        account.incrementNumberOfCredits();
+        accountService.update(account);
+    }*/
+
+    private void checkIfNumberOfCreditsIsMax() {
+        if (activeUser.getAccount().getNumberOfCredits() == MAX_NUMBER_OF_CREDITS)
+            crud.setAddOperationVisible(false);
     }
 
 }

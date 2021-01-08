@@ -27,7 +27,7 @@ public class Credit extends ItemClass {
     @JoinColumn(name = "account_id")
     private Account account;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "submission_id")
     private Submission submission;
 

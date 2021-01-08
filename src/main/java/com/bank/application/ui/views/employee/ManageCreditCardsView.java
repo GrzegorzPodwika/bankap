@@ -1,8 +1,7 @@
 package com.bank.application.ui.views.employee;
 
-import com.bank.application.backend.entity.Credit;
-import com.bank.application.backend.entity.Transaction;
-import com.bank.application.backend.service.CreditService;
+import com.bank.application.backend.entity.CreditCard;
+import com.bank.application.backend.service.CreditCardService;
 import com.bank.application.backend.service.SubmissionService;
 import com.bank.application.backend.service.TransactionService;
 import com.bank.application.ui.views.main.MainView;
@@ -17,30 +16,30 @@ import com.vaadin.flow.router.Route;
 import org.vaadin.crudui.crud.CrudOperation;
 import org.vaadin.crudui.crud.impl.GridCrud;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
-@Route(value = "submission", layout = MainView.class)
-@PageTitle("Submission | BankAP")
-public class SubmissionView extends VerticalLayout {
-    private final CreditService creditService;
+@Route(value = "manageCreditCards", layout = MainView.class)
+@PageTitle("ManageCreditCards | BankAP")
+public class ManageCreditCardsView extends VerticalLayout {
+    private final CreditCardService creditCardService;
     private final SubmissionService submissionService;
     private final TransactionService transactionService;
 
-    public SubmissionView(CreditService creditService, SubmissionService submissionService, TransactionService transactionService) {
-        this.creditService = creditService;
+    public ManageCreditCardsView(CreditCardService creditCardService, SubmissionService submissionService, TransactionService transactionService) {
+        this.creditCardService = creditCardService;
         this.submissionService = submissionService;
         this.transactionService = transactionService;
 
         createTabs();
     }
 
-    public void createTabs() {
+    private void createTabs() {
         Tab unapprovedTab = new Tab("Unapproved");
         Tab approvedTab = new Tab("Approved");
 
-        GridCrud<Credit> unapprovedGrid = createGrid(false);
-        GridCrud<Credit> approvedGrid = createGrid(true);
-        approvedGrid.setVisible(false);
+        GridCrud<CreditCard> unapprovedGrid = createGrid(false);
+        GridCrud<CreditCard> approvedGrid = createGrid(true);
 
         Map<Tab, Component> tabsToPages = new HashMap<>();
         tabsToPages.put(unapprovedTab, unapprovedGrid);
@@ -58,55 +57,39 @@ public class SubmissionView extends VerticalLayout {
         add(tabs, pages);
     }
 
-    public GridCrud<Credit> createGrid(Boolean approved) {
-        GridCrud<Credit> crud = new GridCrud<>(Credit.class);
+    private GridCrud<CreditCard> createGrid(boolean isApproved) {
+        GridCrud<CreditCard> crud = new GridCrud<>(CreditCard.class);
 
-        crud.getGrid().setColumns("account", "amount", "numberOfInstallments",
-                "beginDate", "endDate", "submissionApproved");
-
+        crud.getGrid().setColumns("account", "creditCardNumber", "limitAmount", "startDate", "submissionApproved");
         crud.getCrudFormFactory().setUseBeanValidation(true);
         crud.getCrudFormFactory().setVisibleProperties(CrudOperation.UPDATE, "submissionApproved");
-        crud.getCrudFormFactory().setFieldCaptions(CrudOperation.UPDATE, "Approve");
+        crud.getCrudFormFactory().setFieldCaptions(CrudOperation.UPDATE, "Approve?");
 
-        crud.setFindAllOperation(() -> creditService.findAllBySubmissionApproved(approved));
+        crud.setFindAllOperation(() -> creditCardService.findAllBySubmissionApproved(isApproved));
 
-        if (approved) {
+        if (isApproved) {
             crud.setUpdateOperationVisible(false);
         } else {
-            crud.setUpdateOperation(credit -> {
-                boolean isApproved = credit.getSubmission().getApproved();
-                if(isApproved) {
-                    submissionService.save(credit.getSubmission());
-                    transferCreditAmountToClient(credit);
-                    Notification.show("Submission approved");
+            crud.setUpdateOperation(creditCard -> {
+                boolean approvedByEmployee = creditCard.getSubmissionApproved();
+
+                if (approvedByEmployee) {
+                    submissionService.update(creditCard.getSubmission());
+                    Notification.show("Submission approved!");
                 } else {
-                    Notification.show("Submission not approved");
+                    Notification.show("Submission not approved!");
                     return null;
                 }
 
-                return credit;
+                return creditCard;
             });
         }
 
-
         crud.getGrid().getColumns().forEach(col -> col.setAutoWidth(true));
-
         crud.setShowNotifications(false);
-
         crud.setAddOperationVisible(false);
         crud.setDeleteOperationVisible(false);
-
         setSizeFull();
         return crud;
-    }
-
-    private void transferCreditAmountToClient(Credit credit) {
-        Transaction transaction = new Transaction();
-        transaction.setTransactionTitle("Kredyt na sumę = " + credit.getAmount());
-        transaction.setAmount(credit.getAmount());
-        transaction.setAccount(credit.getAccount());
-        transaction.setReceiverAccountNumber(credit.getAccount().getAccountNumber());
-
-        transactionService.save(transaction);
     }
 }

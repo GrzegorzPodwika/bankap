@@ -5,10 +5,11 @@ import com.bank.application.backend.repository.SubmissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
-public class SubmissionService {
+public class SubmissionService implements Dao<Submission> {
     @Autowired
     private final SubmissionRepository submissionRepository;
 
@@ -16,16 +17,29 @@ public class SubmissionService {
         this.submissionRepository = submissionRepository;
     }
 
-    public SubmissionRepository getSubmissionRepository() {
-        return submissionRepository;
+    @Override
+    public Submission save(Submission submission) {
+        return submissionRepository.save(submission);
     }
 
-    public Optional<Submission> findById(Integer id) {
+    @Override
+    public Submission update(Submission submission) {
+        return submissionRepository.save(submission);
+    }
 
+    @Override
+    public void delete(Submission submission) {
+        submissionRepository.delete(submission);
+    }
+
+    @Override
+    public Optional<Submission> get(Integer id) {
         return submissionRepository.findById(id);
     }
 
-    public void save(Submission submission) {
-        submissionRepository.save(submission);
+    @Override
+    public List<Submission> getAll() {
+        return submissionRepository.findAll();
     }
+
 }

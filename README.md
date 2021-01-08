@@ -26,3 +26,43 @@ update account
 set account_balance = account_balance - OLD.amount  
 WHERE id = OLD.account_id;  
 END$$   
+
+DELIMITER $$
+Create TRIGGER trigger_after_insert_credit AFTER INSERT
+ON credit
+FOR EACH ROW
+BEGIN
+update account
+set number_of_credits = number_of_credits + 1
+WHERE id = NEW.account_id;
+END$$
+
+DELIMITER $$  
+Create TRIGGER trigger_after_insert_credit_card AFTER INSERT  
+ON credit_card  
+FOR EACH ROW  
+BEGIN  
+update account  
+set number_of_credit_cards = number_of_credit_cards + 1  
+WHERE id = NEW.account_id;  
+END$$  
+
+DELIMITER $$  
+Create TRIGGER trigger_after_delete_credit AFTER DELETE  
+ON credit  
+FOR EACH ROW  
+BEGIN  
+update account  
+set number_of_credits = number_of_credits - 1  
+WHERE id = OLD.account_id;  
+END$$  
+
+DELIMITER $$  
+Create TRIGGER trigger_after_delete_credit_card AFTER DELETE  
+ON credit_card  
+FOR EACH ROW  
+BEGIN  
+update account  
+set number_of_credit_cards = number_of_credit_cards - 1  
+WHERE id = OLD.account_id;  
+END$$   
