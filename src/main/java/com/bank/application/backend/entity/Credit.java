@@ -14,6 +14,7 @@ public class Credit extends ItemClass {
     private long amount;
     private int numberOfInstallments;
     private double monthlyInstallment;
+    private int remainingInstallments;
 
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
@@ -46,11 +47,12 @@ public class Credit extends ItemClass {
 
     }
 
-    public Credit(LocalDate beginDate, LocalDate endDate, int amount, int numberOfInstallments) {
+    public Credit(LocalDate beginDate, LocalDate endDate, int amount, int numberOfInstallments, int remainingInstallments) {
         this.beginDate = beginDate;
         this.endDate = endDate;
         this.amount = amount;
         this.numberOfInstallments = numberOfInstallments;
+        this.remainingInstallments = remainingInstallments;
     }
 
     public Account getAccount() {
@@ -107,5 +109,13 @@ public class Credit extends ItemClass {
 
     public void setMonthlyInstallment(double monthlyInstallment) {
         this.monthlyInstallment = monthlyInstallment;
+    }
+
+    public int getRemainingInstallments() {
+        return remainingInstallments;
+    }
+
+    public void setRemainingInstallments(int remainingInstallments) {
+        this.remainingInstallments = remainingInstallments;
     }
 }
