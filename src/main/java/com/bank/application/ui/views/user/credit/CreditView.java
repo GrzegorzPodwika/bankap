@@ -73,11 +73,14 @@ public class CreditView extends Div {
     public void createGrid() {
         crud = new GridCrud<>(Credit.class);
 
-        crud.getGrid().setColumns("amount", "numberOfInstallments", "beginDate", "endDate", "submissionApproved");
+        crud.getGrid().setColumns("amount", "numberOfInstallments", "monthlyInstallment", "remainingInstallments",
+                "beginDate", "endDate", "submissionApproved");
 
         crud.getCrudFormFactory().setUseBeanValidation(true);
         crud.getCrudFormFactory().setVisibleProperties(CrudOperation.ADD,
                 "amount", "numberOfInstallments", "beginDate");
+
+        crud.getGrid().getColumns().forEach(col -> col.setAutoWidth(true));
 
         crud.setFindAllOperation(() -> creditService.findAllByAccount(activeUser.getAccount()));
         checkIfNumberOfCreditsIsMax();
@@ -101,12 +104,13 @@ public class CreditView extends Div {
                 credit.setAmount(creditForm.getAmount());
                 credit.setNumberOfInstallments(creditForm.getNumberOfInstallments());
                 credit.setMonthlyInstallment(calculateNumberOfInstallment(creditForm));
+                credit.setRemainingInstallments(creditForm.getNumberOfInstallments());
                 credit.setBeginDate(creditForm.getBeginDate());
                 credit.setEndDate(calculateEndDate(creditForm));
                 credit.setAccount(account);
                 credit.setSubmission(submission);
 
-                submissionService.save(submission);
+                //submissionService.save(submission);
                 creditService.save(credit);
                 //incrementNumberOfCreditsInClientAccount();
                 checkIfNumberOfCreditsIsMax();
