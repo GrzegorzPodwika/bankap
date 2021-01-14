@@ -38,7 +38,7 @@ public class CredentialsView extends HorizontalLayout {
     private final TextField textFieldPhone = new TextField("Nowy numer telefonu");
 
     public CredentialsView(UserService userService) {
-        setId("payments-view");
+        addClassName("credentials-view");
         this.userService = userService;
 
         setSizeFull();
@@ -67,7 +67,6 @@ public class CredentialsView extends HorizontalLayout {
     private void setUpLayout() {
         fillUpLabelsWithUserCredentials();
 
-
         VerticalLayout vlLabels = new VerticalLayout(
             labelFirstName,
             labelLastName,
@@ -78,8 +77,10 @@ public class CredentialsView extends HorizontalLayout {
         );
 
         vlLabels.setAlignItems(Alignment.END);
+        vlLabels.setId("vl-labels");
 
         Button buttonChangeCredentials = new Button("Zmień dane");
+        buttonChangeCredentials.setId("button-change-credentials");
         buttonChangeCredentials.addClickListener(event -> {
            updateUser();
         });
@@ -92,6 +93,7 @@ public class CredentialsView extends HorizontalLayout {
                 textFieldPhone,
                 buttonChangeCredentials
         );
+        vlTextFields.setId("vl-text-fields");
 
         add(vlLabels, vlTextFields);
     }

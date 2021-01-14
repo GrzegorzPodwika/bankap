@@ -11,7 +11,9 @@ import com.bank.application.other.Constants;
 import com.bank.application.ui.views.main.MainView;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
@@ -30,6 +32,7 @@ import com.vaadin.flow.server.VaadinSession;
 import java.util.Optional;
 
 @Route(value = "home", layout = MainView.class)
+@CssImport("./styles/views/home/home-view.css")
 @PageTitle("Home")
 public class HomeView extends Div {
     private final UserService userService;
@@ -39,16 +42,14 @@ public class HomeView extends Div {
     private H2 balanceH2;
 
     public HomeView(UserService userService, AccountService accountService, TransactionService transactionService) {
+        addClassName("home-view");
         this.userService = userService;
         this.accountService = accountService;
         this.transactionService = transactionService;
 
         fetchFreshUser();
 
-        setId("home-view");
-
         setUpLayoutWithUserCredentials();
-        //createTabs();
     }
 
     private void setUpLayoutWithUserCredentials() {
@@ -60,46 +61,42 @@ public class HomeView extends Div {
         Label labelPhone = new Label("Phone: " + user.getPhone());
         Label labelBirthDate = new Label("BirthDate: " + user.getBirthDate());
 
-/*
+
         FormLayout credentialsLayout = new FormLayout(
                 labelFirstName, labelLastName, labelPesel,
-                labelAddress, labelEmail, labelPhone
+                labelAddress, labelEmail, labelPhone, labelBirthDate
         );
-
+        credentialsLayout.addClassName("credentials-form");
 
         credentialsLayout.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("25em", 1),
-                new FormLayout.ResponsiveStep("32em", 2),
-                new FormLayout.ResponsiveStep("40em", 3)
-        );*/
+                new FormLayout.ResponsiveStep("25em", 2),
+                new FormLayout.ResponsiveStep("25em", 3)
+        );
 
         //TODO tu można jakoś przyrzeźbić żeby to lepiej wyglądało ten ekran powitalny z saldem i user credentials
-        balanceH2 = new H2("Saldo " + user.getAccount().getAccountBalance() + " PLN");
+        balanceH2 = new H2("Saldo: " + user.getAccount().getAccountBalance() + " PLN");
         Button buttonTopUp = new Button("Doładuj konto", new Icon(VaadinIcon.PLUS_CIRCLE));
+        buttonTopUp.setId("button-top-up");
         buttonTopUp.setIconAfterText(true);
         buttonTopUp.setAutofocus(true);
         buttonTopUp.addClickListener(event -> showTopUpDialog());
 
-        HorizontalLayout horizontalLayout = new HorizontalLayout(balanceH2, buttonTopUp);
-        horizontalLayout.setAlignItems(FlexComponent.Alignment.BASELINE);
-        horizontalLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        HorizontalLayout balanceLayout = new HorizontalLayout(balanceH2, buttonTopUp);
+        balanceLayout.addClassName("balance-layout");
+        balanceLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        balanceLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
 
-        H3 accountNumber = new H3("Numer konta " + user.getAccount().getAccountNumber());
+        H3 accountNumber = new H3("Numer konta: " + user.getAccount().getAccountNumber());
 
         VerticalLayout verticalLayout = new VerticalLayout();
 
         if (user.getRole() == Role.USER) {
-            verticalLayout.add(horizontalLayout, accountNumber);
+            verticalLayout.add(balanceLayout, accountNumber);
         }
 
         verticalLayout.add(
-                labelFirstName,
-                labelLastName,
-                labelPesel,
-                labelAddress,
-                labelEmail,
-                labelPhone,
-                labelBirthDate
+                credentialsLayout
         );
 
         verticalLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
@@ -110,9 +107,11 @@ public class HomeView extends Div {
 
     private void showTopUpDialog() {
         Dialog dialog = new Dialog();
+        dialog.setId("dialog-top-up");
         dialog.setCloseOnOutsideClick(false);
 
         VerticalLayout verticalLayout = new VerticalLayout();
+        verticalLayout.setId("vert-layout-top-up");
         NumberField numberFieldTopUpAmount = new NumberField("Wartość wpłaty");
         TextField textFieldTransactionTitle = new TextField("Tytuł wpłaty");
 
@@ -139,7 +138,7 @@ public class HomeView extends Div {
 
                     transactionService.save(transaction);
 
-                    balanceH2.setText("Saldo " + newBalance + " PLN");
+                    balanceH2.setText("Saldo: " + newBalance + " PLN");
                     dialog.close();
                 } else {
                     textFieldTransactionTitle.setErrorMessage("Tytuł wpłaty nie może być pusty");
