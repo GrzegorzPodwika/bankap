@@ -18,6 +18,8 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
+import java.time.LocalDate;
+
 @Route("register")
 @PageTitle("Register | BankAP")
 @CssImport("./styles/views/register/register-view.css")
@@ -36,10 +38,8 @@ public class RegisterView extends Composite {
         TextField firstName = new TextField("First Name");
         TextField lastName = new TextField("Last Name");
         TextField pesel = createPesel();
-        TextField address = new TextField("Address");
-        address.setPlaceholder("Home Address");
-        DatePicker dateOfBirth = new DatePicker();
-        dateOfBirth.setLabel("Date of Birth");
+        TextField address = new TextField("Address", "Home Address");
+        DatePicker dateOfBirth = new DatePicker("Date of Birth");
         EmailField emailField = createEmail();
         TextField phone = createPhone();
 
@@ -73,7 +73,7 @@ public class RegisterView extends Composite {
                         address.getValue(),
                         emailField.getValue(),
                         phone.getValue(),
-                        dateOfBirth.getValue().toString()
+                        dateOfBirth.getValue()
                 )));
 
         verticalLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
@@ -82,7 +82,7 @@ public class RegisterView extends Composite {
     }
 
     private void register(String username, String password, String confirmPassword, String firstName, String lastName,
-                          String pesel, String address, String email, String phone, String birthDate) {
+                          String pesel, String address, String email, String phone, LocalDate birthDate) {
 
         if (username.trim().isEmpty()) {
             Notification.show("Enter a username");
@@ -90,11 +90,19 @@ public class RegisterView extends Composite {
             Notification.show("Enter a password");
         } else if(!password.equals(confirmPassword)) {
             Notification.show("Passwords don't match!");
-        } else {
-            authService.register(username, password, firstName, lastName, pesel, address, email, phone, birthDate);
+        } else if(!email.matches("^([a-zA-Z0-9_\\.\\-+])+@[a-zA-Z0-9-.]+\\.[a-zA-Z0-9-]{2,}$")){
+            Notification.show("Email is not correct!");
+        } else if(phone.length() != 9){
+            Notification.show("Phone number is not correct!");
+        } else if(pesel.length() != 11){
+            Notification.show("Pesel is not correct!");
+        } else if(birthDate == null){
+            Notification.show("Choose birth date!");
+        }else {
+            authService.register(username, password, firstName, lastName, pesel, address, email, phone, birthDate.toString());
             Notification.show("Registration succeeded.");
             try {
-                Thread.sleep(1000);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } finally {
@@ -125,7 +133,7 @@ public class RegisterView extends Composite {
         id.setPattern("[0-9]*");
         id.setPreventInvalidInput(true);
         id.setMaxLength(11);
-        id.setPlaceholder("Your Pesel");
+        id.setPlaceholder("10109703223");
 
         return id;
     }

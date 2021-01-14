@@ -5,6 +5,7 @@ import com.bank.application.backend.service.UserService;
 import com.bank.application.other.Constants;
 import com.bank.application.ui.views.main.MainView;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -18,6 +19,7 @@ import java.util.Optional;
 import static com.bank.application.ui.views.home.HomeView.UserNotFoundException;
 
 @Route(value = "credentials", layout = MainView.class)
+@CssImport("./styles/views/credentials/credentials-view.css")
 @PageTitle("Credentials")
 public class CredentialsView extends HorizontalLayout {
 

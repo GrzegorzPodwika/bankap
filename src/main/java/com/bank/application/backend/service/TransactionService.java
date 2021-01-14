@@ -48,6 +48,10 @@ public class TransactionService implements Dao<Transaction>{
         return repo.findAllTransactions(account);
     }
 
+    public List<Transaction> findAllByAccountAndDate(Account account, String startDate) {
+        return repo.findAllTransactionsByDate(account, startDate);
+    }
+
     public List<Transaction> findAllByTimestamp() {
         return repo.findAllByOrderByTimestampDesc();
     }
