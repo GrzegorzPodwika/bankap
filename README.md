@@ -65,4 +65,61 @@ BEGIN
 update account  
 set number_of_credit_cards = number_of_credit_cards - 1  
 WHERE id = OLD.account_id;  
-END$$   
+END$$  
+
+# Procedures
+```sql
+DELIMITER $$
+CREATE PROCEDURE make_installments()
+BEGIN
+  DECLARE done BOOLEAN DEFAULT FALSE;
+  DECLARE account_id_var BIGINT UNSIGNED;
+  DECLARE credit_id_var BIGINT UNSIGNED;
+  DECLARE cur CURSOR FOR SELECT credit.id, credit.account_id FROM credit JOIN submission ON credit.submission_id = submission.id WHERE submission.is_approved = TRUE;
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done := TRUE;
+
+  OPEN cur;
+
+  testLoop: LOOP
+    FETCH cur INTO credit_id_var, account_id_var;
+    IF done THEN
+      LEAVE testLoop;
+    END IF;
+	SET @max_transaction_id = (SELECT MAX(id) FROM transaction);
+	SET @payment = (SELECT monthly_installment FROM credit WHERE credit.id = credit_id_var );
+	SET @remaining_installments_var = (SELECT remaining_installments FROM credit WHERE credit.id = credit_id_var);
+	SET @current_date_var = (SELECT DATE_FORMAT(NOW(), '%Y-%m-%d'));
+	SET @receiver_account_number_var = (SELECT IFNULL(CAST(account_number AS VARCHAR(255)), 'N/A') AS account_number FROM account WHERE account.id = account_id_var);
+	SET @timestamp_var = (SELECT CAST(UNIX_TIMESTAMP(NOW(3)) * 1000 AS unsigned));
+	
+	IF @remaining_installments_var > 0 THEN
+		UPDATE credit SET remaining_installments = remaining_installments - 1 WHERE credit.id = credit_id_var;
+		INSERT INTO transaction VALUES(@max_transaction_id + 1, -1.0 * @payment, @current_date_var, @receiver_account_number_var, @timestamp_var, 'Spłata kredytu', account_id_var);
+	END IF;
+ 
+  END LOOP testLoop;
+
+  CLOSE cur;
+END $$
+DELIMITER ; 
+```
+
+# Events
+### Remember to turn on events!
+```sql
+SET GLOBAL event_scheduler = ON;
+```
+
+- ON SCHEDULE EVERY 1 DAY
+- ON SCHEDULE EVERY 1 MONTH
+```sql
+DELIMITER $$
+CREATE EVENT trigger_installments_event
+ON SCHEDULE EVERY 1 MINUTE
+DO 
+BEGIN
+	CALL make_installments();
+END $$
+
+DELIMITER ;
+```
