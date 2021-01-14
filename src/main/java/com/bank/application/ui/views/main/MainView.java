@@ -42,12 +42,10 @@ public class MainView extends AppLayout {
     private final Tabs menu;
     private H1 viewTitle;
     private final AuthService authService;
-    private final UserService userService;
-    private User user;
 
-    public MainView(AuthService authService, UserService userService) {
+    public MainView(AuthService authService) {
         this.authService = authService;
-        this.userService = userService;
+
         setPrimarySection(Section.DRAWER);
         addToNavbar(true, createHeaderContent());
         menu = createMenu();
@@ -70,15 +68,16 @@ public class MainView extends AppLayout {
         ContextMenu contextMenu = new ContextMenu(avatar);
         contextMenu.setOpenOnClick(true);
         contextMenu.addItem("Settings",
-                e -> Notification.show("Not implemented yet.", 3000,
-                        Notification.Position.BOTTOM_CENTER));
+                e -> navigateToCredentialsPage());
         contextMenu.addItem("Log Out",
-                e -> {
-                    logout();
-                });
+                e -> logout());
 
         layout.add(avatar);
         return layout;
+    }
+
+    private void navigateToCredentialsPage() {
+        UI.getCurrent().navigate("credentials");
     }
 
     private void logout() {
@@ -109,25 +108,8 @@ public class MainView extends AppLayout {
         tabs.addThemeVariants(TabsVariant.LUMO_MINIMAL);
         tabs.setId("tabs");
         tabs.add(createMenuItems());
-/*        try {
-            fetchUserById();
-            tabs.add(createMenuItems());
-        } catch (UserNotFoundException e) {
-            System.out.println("User has not been found!");
-        }*/
         return tabs;
     }
-
-/*    private void fetchUserById() throws UserNotFoundException {
-        Integer userId = (Integer) VaadinSession.getCurrent().getAttribute(Constants.USER_ID);
-        Optional<User> fetchedUpdatedUser = userService.findUserById(userId);
-        if (fetchedUpdatedUser.isPresent()) {
-            user = fetchedUpdatedUser.get();
-        } else {
-            throw new UserNotFoundException();
-        }
-    }*/
-
 
     private Component[] createMenuItems() {
         User user = VaadinSession.getCurrent().getAttribute(User.class);

@@ -13,6 +13,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     @Query(value = "SELECT t FROM Transaction t WHERE account = ?1")
     List<Transaction> findAllTransactions(Account account);
 
+    @Query(value = "SELECT t FROM Transaction t WHERE account = ?1 AND date >= ?2")
+    List<Transaction> findAllTransactionsByDate(Account account, String startDate);
+
     List<Transaction> findAllByOrderByTimestampDesc();
 
     Transaction findByAccountAndTransactionTitle(Account account, String transactionTitle);

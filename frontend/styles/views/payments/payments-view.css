@@ -1,8 +1,9 @@
-#payments-view {
+.payments-view {
   display: block;
   height: 100%;
   flex-direction: column;
 }
+
 
 :host {
   display: flex;
@@ -36,4 +37,8 @@
   flex-wrap: wrap;
   background-color: var(--lumo-contrast-5pct);
   padding: var(--lumo-space-s) var(--lumo-space-l);
+}
+
+.payments-view #button-wrapper {
+
 }
