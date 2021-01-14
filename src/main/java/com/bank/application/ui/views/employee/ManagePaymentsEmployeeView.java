@@ -32,6 +32,8 @@ public class ManagePaymentsEmployeeView extends VerticalLayout {
         crud.setUpdateOperationVisible(false);
         crud.setFindAllOperation(transactionService::findAllByTimestamp);
 
+        crud.getGrid().getColumns().forEach(col -> col.setAutoWidth(true));
+
         crud.setDeleteOperation(transaction -> {
             if (!transaction.getAccount().getAccountNumber().equals(transaction.getReceiverAccountNumber())) {
                 Optional<Account> searchReceiver = accountService.existAccountByAccountNumber(transaction.getReceiverAccountNumber());
