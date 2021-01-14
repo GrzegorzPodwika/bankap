@@ -80,8 +80,6 @@ public class Account extends ItemClass {
 
     @Override
     public String toString() {
-        return "Account{" +
-                "accountNumber='" + accountNumber + '\'' +
-                '}';
+        return accountNumber;
     }
 }
