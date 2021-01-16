@@ -41,4 +41,8 @@ public class UserService implements Dao<User> {
         return userRepository.findAll();
     }
 
+    public List<User> getAllClientsAndEmployees() {
+        return userRepository.findAllClientsAndEmployees();
+    }
+
 }
