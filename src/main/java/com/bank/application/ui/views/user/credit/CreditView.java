@@ -1,9 +1,6 @@
 package com.bank.application.ui.views.user.credit;
 
-import com.bank.application.backend.entity.Account;
-import com.bank.application.backend.entity.Credit;
-import com.bank.application.backend.entity.Submission;
-import com.bank.application.backend.entity.User;
+import com.bank.application.backend.entity.*;
 import com.bank.application.backend.service.AccountService;
 import com.bank.application.backend.service.CreditService;
 import com.bank.application.backend.service.SubmissionService;
@@ -12,6 +9,7 @@ import com.bank.application.other.Constants;
 import com.bank.application.ui.views.home.HomeView.UserNotFoundException;
 import com.bank.application.ui.views.main.MainView;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.PageTitle;
@@ -39,13 +37,12 @@ public class CreditView extends Div {
 
 
     public CreditView(CreditService creditService, UserService userService, SubmissionService submissionService, AccountService accountService) {
+        setClassName("credit-view");
+
         this.submissionService = submissionService;
         this.userService = userService;
         this.creditService = creditService;
         this.accountService = accountService;
-
-        setId("credit-view");
-
         fetchActiveUser();
 
         createGrid();
@@ -69,7 +66,6 @@ public class CreditView extends Div {
         }
     }
 
-
     public void createGrid() {
         crud = new GridCrud<>(Credit.class);
 
@@ -79,6 +75,7 @@ public class CreditView extends Div {
         crud.getCrudFormFactory().setUseBeanValidation(true);
         crud.getCrudFormFactory().setVisibleProperties(CrudOperation.ADD,
                 "amount", "numberOfInstallments", "beginDate");
+        crud.getGrid().setSelectionMode(Grid.SelectionMode.SINGLE);
 
         crud.getGrid().getColumns().forEach(col -> col.setAutoWidth(true));
 

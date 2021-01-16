@@ -43,11 +43,13 @@ public class CreditCard extends ItemClass {
         submission.setApproved(submissionApproved);
     }
 
+    private boolean isBlocked;
 
     public CreditCard() {
         creditCardNumber = BankUtils.generateRandomCardNumber();
         limitAmount = 0;
         usedFunds = 0.0;
+        isBlocked = false;
     }
 
     public CreditCard(String creditCardNumber) {
@@ -108,5 +110,13 @@ public class CreditCard extends ItemClass {
 
     public void setSubmission(Submission submission) {
         this.submission = submission;
+    }
+
+    public boolean isBlocked() {
+        return isBlocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        isBlocked = blocked;
     }
 }
