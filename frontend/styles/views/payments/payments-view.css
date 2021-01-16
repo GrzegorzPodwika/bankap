@@ -39,6 +39,6 @@
   padding: var(--lumo-space-s) var(--lumo-space-l);
 }
 
-.payments-view #button-wrapper {
-
+.payments-view #generate-statement-layout {
+    margin-left: 16px;
 }

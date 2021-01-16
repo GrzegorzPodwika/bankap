@@ -7,6 +7,7 @@ import com.bank.application.backend.entity.User;
 import com.bank.application.backend.service.AccountService;
 import com.bank.application.backend.service.TransactionService;
 import com.bank.application.backend.service.UserService;
+import com.bank.application.other.BankUtils;
 import com.bank.application.other.Constants;
 import com.bank.application.ui.views.main.MainView;
 import com.vaadin.flow.component.Text;
@@ -31,6 +32,8 @@ import com.vaadin.flow.server.VaadinSession;
 
 import java.util.Optional;
 
+import static com.bank.application.other.BankUtils.*;
+
 @Route(value = "home", layout = MainView.class)
 @CssImport("./styles/views/home/home-view.css")
 @PageTitle("Home")
@@ -39,7 +42,7 @@ public class HomeView extends Div {
     private final AccountService accountService;
     private final TransactionService transactionService;
     private User user;
-    private H2 balanceH2;
+    private final H2 balanceH2 = new H2();
 
     public HomeView(UserService userService, AccountService accountService, TransactionService transactionService) {
         addClassName("home-view");
@@ -53,36 +56,60 @@ public class HomeView extends Div {
     }
 
     private void setUpLayoutWithUserCredentials() {
-        Label labelFirstName = new Label("First Name: " + user.getFirstName());
-        Label labelLastName = new Label("Last Name: " + user.getLastName());
-        Label labelPesel = new Label("Pesel: " + user.getPesel());
-        Label labelAddress = new Label("Address: " + user.getAddress());
-        Label labelEmail = new Label("Email: " + user.getEmail());
-        Label labelPhone = new Label("Phone: " + user.getPhone());
-        Label labelBirthDate = new Label("BirthDate: " + user.getBirthDate());
+        TextField labelFirstName = new TextField("Imię:");
+        labelFirstName.setValue(user.getFirstName());
+        labelFirstName.setReadOnly(true);
 
+        TextField labelLastName = new TextField("Nazwisko:");
+        labelLastName.setValue(user.getLastName());
+        labelLastName.setReadOnly(true);
 
-        FormLayout credentialsLayout = new FormLayout(
-                labelFirstName, labelLastName, labelPesel,
-                labelAddress, labelEmail, labelPhone, labelBirthDate
+        TextField labelPesel = new TextField("Pesel:");
+        labelPesel.setValue(user.getPesel());
+        labelPesel.setReadOnly(true);
+
+        TextField labelAddress = new TextField("Adres:");
+        labelAddress.setValue(user.getAddress());
+        labelAddress.setReadOnly(true);
+
+        TextField labelEmail = new TextField("Email:");
+        labelEmail.setValue(user.getEmail());
+        labelEmail.setReadOnly(true);
+
+        TextField labelPhone = new TextField("Numer komórkowy:");
+        labelPhone.setValue(user.getPhone());
+        labelPhone.setReadOnly(true);
+
+        TextField labelBirthDate = new TextField("Data urodzenia:");
+        labelBirthDate.setValue(user.getBirthDate());
+        labelBirthDate.setReadOnly(true);
+
+        VerticalLayout credentialsLayout = new VerticalLayout(
+                labelFirstName,
+                labelLastName,
+                labelPesel,
+                labelAddress,
+                labelEmail,
+                labelPhone,
+                labelBirthDate
         );
         credentialsLayout.addClassName("credentials-form");
+        credentialsLayout.setAlignItems(FlexComponent.Alignment.CENTER);
 
-        credentialsLayout.setResponsiveSteps(
-                new FormLayout.ResponsiveStep("25em", 1),
-                new FormLayout.ResponsiveStep("25em", 2),
-                new FormLayout.ResponsiveStep("25em", 3)
-        );
+        Icon balanceIcon = new Icon(VaadinIcon.MONEY_EXCHANGE);
+        balanceIcon.setId("balance-icon");
+        H2 balancePrefix = new H2("Saldo:");
+        balanceH2.setId("balance-h2");
+        balanceH2.setText(roundOff(user.getAccount().getAccountBalance()));
+        H2 balanceSuffix = new H2("PLN");
 
-        //TODO tu można jakoś przyrzeźbić żeby to lepiej wyglądało ten ekran powitalny z saldem i user credentials
-        balanceH2 = new H2("Saldo: " + user.getAccount().getAccountBalance() + " PLN");
         Button buttonTopUp = new Button("Doładuj konto", new Icon(VaadinIcon.PLUS_CIRCLE));
         buttonTopUp.setId("button-top-up");
         buttonTopUp.setIconAfterText(true);
         buttonTopUp.setAutofocus(true);
         buttonTopUp.addClickListener(event -> showTopUpDialog());
 
-        HorizontalLayout balanceLayout = new HorizontalLayout(balanceH2, buttonTopUp);
+        HorizontalLayout balanceLayout = new HorizontalLayout(balanceIcon, balancePrefix,balanceH2, balanceSuffix,buttonTopUp);
         balanceLayout.addClassName("balance-layout");
         balanceLayout.setAlignItems(FlexComponent.Alignment.CENTER);
         balanceLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
@@ -127,7 +154,6 @@ public class HomeView extends Div {
                 if (!textFieldTransactionTitle.getValue().isEmpty()) {
 
                     double newBalance = user.getAccount().getAccountBalance() + numberFieldTopUpAmount.getValue();
-                    newBalance =  Math.round(newBalance*100) / 100.0;
                     Account userAccount = user.getAccount();
 
                     Transaction transaction = new Transaction();
@@ -138,7 +164,7 @@ public class HomeView extends Div {
 
                     transactionService.save(transaction);
 
-                    balanceH2.setText("Saldo: " + newBalance + " PLN");
+                    balanceH2.setText(roundOff(newBalance));
                     dialog.close();
                 } else {
                     textFieldTransactionTitle.setErrorMessage("Tytuł wpłaty nie może być pusty");

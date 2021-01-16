@@ -27,4 +27,9 @@ public class BankUtils {
 
         return accountNumber.toString();
     }
+
+    public static String roundOff(Double value) {
+        double roundOff =  Math.round(value * 100.0) / 100.0;
+        return String.valueOf(roundOff);
+    }
 }
