@@ -2,9 +2,11 @@
  Simple web bank application for studying purposes.
 
 # Triggers
+```sql
+SET GLOBAL log_bin_trust_function_creators = 1; with admin privileges firstly
+```
 
-//SET GLOBAL log_bin_trust_function_creators = 1; with admin privileges firstly
-
+```sql
 DELIMITER $$  
 Create TRIGGER trigger_after_insert_transaction AFTER INSERT  
 ON transaction  
@@ -16,7 +18,9 @@ WHERE id = NEW.account_id;
 END$$
 
 DELIMITER ;
+```
 
+```sql
 DELIMITER $$  
 Create TRIGGER trigger_after_delete_transaction AFTER DELETE  
 ON transaction  
@@ -27,6 +31,10 @@ set account_balance = account_balance - OLD.amount
 WHERE id = OLD.account_id;  
 END$$   
 
+DELIMITER ;
+```
+
+```sql
 DELIMITER $$
 Create TRIGGER trigger_after_insert_credit AFTER INSERT
 ON credit
@@ -37,6 +45,10 @@ set number_of_credits = number_of_credits + 1
 WHERE id = NEW.account_id;
 END$$
 
+DELIMITER ;
+```
+
+```sql
 DELIMITER $$  
 Create TRIGGER trigger_after_insert_credit_card AFTER INSERT  
 ON credit_card  
@@ -47,6 +59,10 @@ set number_of_credit_cards = number_of_credit_cards + 1
 WHERE id = NEW.account_id;  
 END$$  
 
+DELIMITER ;
+```
+
+```sql
 DELIMITER $$  
 Create TRIGGER trigger_after_delete_credit AFTER DELETE  
 ON credit  
@@ -57,6 +73,10 @@ set number_of_credits = number_of_credits - 1
 WHERE id = OLD.account_id;  
 END$$  
 
+DELIMITER ;
+```
+
+```sql
 DELIMITER $$  
 Create TRIGGER trigger_after_delete_credit_card AFTER DELETE  
 ON credit_card  
@@ -66,6 +86,9 @@ update account
 set number_of_credit_cards = number_of_credit_cards - 1  
 WHERE id = OLD.account_id;  
 END$$  
+
+DELIMITER ;
+```
 
 # Procedures
 #### Credit repayment
