@@ -91,6 +91,18 @@ public class AuthService {
         accountRepository.save(account);
     }
 
+    public void register(String username, String password, String firstName, String lastName,
+                         String pesel, String address, String email, String phone, String birthDate, Role userRole) {
+        Account account = new Account(BankUtils.generateRandomAccountNumber());
+        User user = new User(username, password, userRole, firstName, lastName, pesel, address, email, phone, birthDate);
+
+        user.setAccount(account);
+        account.setUser(user);
+
+        userRepository.save(user);
+        accountRepository.save(account);
+    }
+
 
     public static class AuthorizedRoute {
         private final String route;

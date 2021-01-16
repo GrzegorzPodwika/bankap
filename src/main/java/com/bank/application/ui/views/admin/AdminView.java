@@ -1,175 +1,164 @@
 package com.bank.application.ui.views.admin;
 
-import com.bank.application.backend.entity.Person;
-import com.vaadin.flow.component.AbstractField;
-import com.vaadin.flow.component.HasStyle;
+import com.bank.application.backend.entity.Role;
+import com.bank.application.backend.service.AuthService;
+import com.bank.application.ui.views.main.MainView;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.splitlayout.SplitLayout;
-import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.EmailField;
+import com.vaadin.flow.component.textfield.PasswordField;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 
-import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.Route;
+
+import java.time.LocalDate;
+import java.util.Arrays;
 
 @PageTitle("Admin")
 @CssImport("./styles/views/admin/admin-view.css")
-public class AdminView extends Div {
+@Route(value = "admin", layout = MainView.class)
+public class AdminView extends Composite {
+    private final AuthService authService;
 
-    private Grid<Person> grid = new Grid<>(Person.class, false);
+    private final TextField username = new TextField("Username");
+    private final PasswordField password = new PasswordField("Password");
+    private final PasswordField confirmPassword = new PasswordField("Confirm Password");
+    private final TextField firstName = new TextField("First Name");
+    private final TextField lastName = new TextField("Last Name");
+    private final TextField pesel = createPesel();
+    private final TextField address = new TextField("Address", "Home Address");
+    private final DatePicker dateOfBirth = new DatePicker("Date of Birth");
+    private final EmailField emailField = createEmail();
+    private final TextField phone = createPhone();
+    private final ComboBox<String> userRole = new ComboBox<>("Role", Arrays.asList("USER", "EMPLOYEE"));
 
-    private TextField firstName;
-    private TextField lastName;
-    private TextField email;
-    private TextField phone;
-    private DatePicker dateOfBirth;
-    private TextField occupation;
-    private Checkbox important;
-
-    private Button cancel = new Button("Cancel");
-    private Button save = new Button("Save");
-
-    private BeanValidationBinder<Person> binder;
-
-    private Person person;
-
-    public AdminView() {
-        setId("admin-view");
-        // Create UI
-        SplitLayout splitLayout = new SplitLayout();
-        splitLayout.setSizeFull();
-
-        createGridLayout(splitLayout);
-        createEditorLayout(splitLayout);
-
-        add(splitLayout);
-
-/*        // Configure Grid
-        grid.addColumn("firstName").setAutoWidth(true);
-        grid.addColumn("lastName").setAutoWidth(true);
-        grid.addColumn("email").setAutoWidth(true);
-        grid.addColumn("phone").setAutoWidth(true);
-        grid.addColumn("dateOfBirth").setAutoWidth(true);
-        grid.addColumn("occupation").setAutoWidth(true);
-        TemplateRenderer<Person> importantRenderer = TemplateRenderer.<Person>of(
-                "<iron-icon hidden='[[!item.important]]' icon='vaadin:check' style='width: var(--lumo-icon-size-s); height: var(--lumo-icon-size-s); color: var(--lumo-primary-text-color);'></iron-icon><iron-icon hidden='[[item.important]]' icon='vaadin:minus' style='width: var(--lumo-icon-size-s); height: var(--lumo-icon-size-s); color: var(--lumo-disabled-text-color);'></iron-icon>")
-                .withProperty("important", Person::isImportant);
-        grid.addColumn(importantRenderer).setHeader("Important").setAutoWidth(true);
-
-        grid.setDataProvider(new CrudServiceDataProvider<>(personService));
-        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-        grid.setHeightFull();
-
-        // when a row is selected or deselected, populate form
-        grid.asSingleSelect().addValueChangeListener(event -> {
-            if (event.getValue() != null) {
-                Optional<Person> personFromBackend = personService.get(event.getValue().getId());
-                // when a row is selected but the data is no longer available, refresh grid
-                if (personFromBackend.isPresent()) {
-                    populateForm(personFromBackend.get());
-                } else {
-                    refreshGrid();
-                }
-            } else {
-                clearForm();
-            }
-        });
-
-        // Configure Form
-        binder = new BeanValidationBinder<>(Person.class);
-
-        // Bind fields. This where you'd define e.g. validation rules
-
-        binder.bindInstanceFields(this);
-
-        cancel.addClickListener(e -> {
-            clearForm();
-            refreshGrid();
-        });
-
-        save.addClickListener(e -> {
-            try {
-                if (this.person == null) {
-                    this.person = new Person();
-                }
-                binder.writeBean(this.person);
-                personService.update(this.person);
-                clearForm();
-                refreshGrid();
-                Notification.show("Person details stored.");
-            } catch (ValidationException validationException) {
-                Notification.show("An exception happened while trying to store the person details.");
-            }
-        });*/
-
+    public AdminView(AuthService authService) {
+        this.authService = authService;
     }
 
-    private void createEditorLayout(SplitLayout splitLayout) {
-        Div editorLayoutDiv = new Div();
-        editorLayoutDiv.setId("editor-layout");
+    @Override
+    protected Component initContent() {
 
-        Div editorDiv = new Div();
-        editorDiv.setId("editor");
-        editorLayoutDiv.add(editorDiv);
+        FormLayout formLayout = new FormLayout(
+                username,
+                password,
+                confirmPassword,
+                firstName,
+                lastName,
+                pesel,
+                address,
+                dateOfBirth,
+                emailField,
+                phone,
+                userRole
+        );
 
-        FormLayout formLayout = new FormLayout();
-        firstName = new TextField("First Name");
-        lastName = new TextField("Last Name");
-        email = new TextField("Email");
-        phone = new TextField("Phone");
-        dateOfBirth = new DatePicker("Date Of Birth");
-        occupation = new TextField("Address");
-        important = new Checkbox("Employee");
-        important.getStyle().set("padding-top", "var(--lumo-space-m)");
-        AbstractField<?, ?>[] fields = new AbstractField<?, ?>[]{firstName, lastName, email, phone, dateOfBirth,
-                occupation, important};
+        formLayout.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("25em", 1),
+                new FormLayout.ResponsiveStep("32em", 2),
+                new FormLayout.ResponsiveStep("40em", 3));
 
-        for (AbstractField<?, ?> field : fields) {
-            ((HasStyle) field).addClassName("full-width");
+        VerticalLayout verticalLayout = new VerticalLayout(new H1("Add user to database"),
+                formLayout,
+                new Button("Sign up", e -> register(
+                        username.getValue(),
+                        password.getValue(),
+                        confirmPassword.getValue(),
+                        firstName.getValue(),
+                        lastName.getValue(),
+                        pesel.getValue(),
+                        address.getValue(),
+                        emailField.getValue(),
+                        phone.getValue(),
+                        dateOfBirth.getValue(),
+                        userRole.getValue()
+                )));
+
+        verticalLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        verticalLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        return verticalLayout;
+    }
+
+    private void register(String username, String password, String confirmPassword, String firstName, String lastName,
+                          String pesel, String address, String email, String phone, LocalDate birthDate, String role) {
+
+        if (username.trim().isEmpty()) {
+            Notification.show("Enter a username");
+        } else if(password.isEmpty()) {
+            Notification.show("Enter a password");
+        } else if(!password.equals(confirmPassword)) {
+            Notification.show("Passwords don't match!");
+        } else if(firstName.isEmpty()) {
+            Notification.show("Enter a firstName");
+        } else if(lastName.isEmpty()) {
+            Notification.show("Enter a lastName");
+        } else if(address.isEmpty()) {
+            Notification.show("Enter a address");
+        } else if(!email.matches("^([a-zA-Z0-9_\\.\\-+])+@[a-zA-Z0-9-.]+\\.[a-zA-Z0-9-]{2,}$")){
+            Notification.show("Email is not correct!");
+        } else if(phone.length() != 9){
+            Notification.show("Phone number is not correct!");
+        } else if(pesel.length() != 11){
+            Notification.show("Pesel is not correct!");
+        } else if(birthDate == null){
+            Notification.show("Choose birth date!");
+        } else if(role == null){
+            Notification.show("Choose user role!");
+        } else {
+            authService.register(username, password, firstName, lastName, pesel, address, email, phone, birthDate.toString(), Role.valueOf(role));
+            Notification.show("Registration succeeded.", 5000, Notification.Position.MIDDLE);
+            clearTextFields();
         }
-        formLayout.add(fields);
-        editorDiv.add(formLayout);
-        createButtonLayout(editorLayoutDiv);
-
-        splitLayout.addToSecondary(editorLayoutDiv);
     }
 
-    private void createButtonLayout(Div editorLayoutDiv) {
-        HorizontalLayout buttonLayout = new HorizontalLayout();
-        buttonLayout.setId("button-layout");
-        buttonLayout.setWidthFull();
-        buttonLayout.setSpacing(true);
-        cancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        buttonLayout.add(save, cancel);
-        editorLayoutDiv.add(buttonLayout);
+    private EmailField createEmail() {
+        EmailField emailField = new EmailField("Email");
+        emailField.setClearButtonVisible(true);
+        emailField.setErrorMessage("Please enter a valid email address");
+        return emailField;
     }
 
-    private void createGridLayout(SplitLayout splitLayout) {
-        Div wrapper = new Div();
-        wrapper.setId("grid-wrapper");
-        wrapper.setWidthFull();
-        splitLayout.addToPrimary(wrapper);
-        wrapper.add(grid);
+    private TextField createPhone() {
+        TextField phone = new TextField("Phone");
+        phone.setPattern("[0-9]*");
+        phone.setPreventInvalidInput(true);
+        phone.setMaxLength(9);
+        phone.setPlaceholder("123456789");
+
+        return phone;
     }
 
-    private void refreshGrid() {
-        grid.select(null);
-        grid.getDataProvider().refreshAll();
+    private TextField createPesel() {
+        TextField id = new TextField("Pesel");
+        id.setPattern("[0-9]*");
+        id.setPreventInvalidInput(true);
+        id.setMaxLength(11);
+        id.setPlaceholder("10109703223");
+
+        return id;
     }
 
-    private void clearForm() {
-        populateForm(null);
-    }
-
-    private void populateForm(Person value) {
-        this.person = value;
-        binder.readBean(this.person);
+    private void clearTextFields() {
+        username.clear();
+        password.clear();
+        confirmPassword.clear();
+        firstName.clear();
+        lastName.clear();
+        pesel.clear();
+        address.clear();
+        dateOfBirth.clear();
+        emailField.clear();
+        phone.clear();
+        userRole.clear();
     }
 }

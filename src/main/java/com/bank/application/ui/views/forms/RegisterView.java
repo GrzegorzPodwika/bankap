@@ -90,6 +90,12 @@ public class RegisterView extends Composite {
             Notification.show("Enter a password");
         } else if(!password.equals(confirmPassword)) {
             Notification.show("Passwords don't match!");
+        } else if(firstName.isEmpty()) {
+            Notification.show("Enter a firstName");
+        } else if(lastName.isEmpty()) {
+            Notification.show("Enter a lastName");
+        } else if(address.isEmpty()) {
+            Notification.show("Enter a address");
         } else if(!email.matches("^([a-zA-Z0-9_\\.\\-+])+@[a-zA-Z0-9-.]+\\.[a-zA-Z0-9-]{2,}$")){
             Notification.show("Email is not correct!");
         } else if(phone.length() != 9){
