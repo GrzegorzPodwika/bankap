@@ -18,6 +18,15 @@
     margin-left: 30px;
 }
 
+.home-view #balance-h2 {
+    color: Red;
+}
+
+.home-view #balance-icon {
+    color: red;
+    margin-top: 20px;
+}
+
 #vert-layout-top-up {
     font-weight: bold;
     font-size: 25px;
