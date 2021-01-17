@@ -84,18 +84,18 @@ public class RegisterView extends Composite {
     private void register(String username, String password, String confirmPassword, String firstName, String lastName,
                           String pesel, String address, String email, String phone, LocalDate birthDate) {
 
-        if (username.trim().isEmpty()) {
-            Notification.show("Enter a username");
+        if (!username.matches("^\\w+$")) {
+            Notification.show("Enter a valid username");
         } else if(password.isEmpty()) {
-            Notification.show("Enter a password");
+            Notification.show("Enter a valid password");
         } else if(!password.equals(confirmPassword)) {
             Notification.show("Passwords don't match!");
-        } else if(firstName.isEmpty()) {
-            Notification.show("Enter a firstName");
-        } else if(lastName.isEmpty()) {
-            Notification.show("Enter a lastName");
-        } else if(address.isEmpty()) {
-            Notification.show("Enter a address");
+        } else if(!firstName.matches("^[A-Z]([a-z])+$")) {
+            Notification.show("Enter a valid firstName");
+        } else if(!lastName.matches("^[A-Z]([a-z])+$")) {
+            Notification.show("Enter a valid lastName");
+        } else if(!address.matches("^[A-Z]([a-z]\\s?)+$")) {
+            Notification.show("Enter a valid address");
         } else if(!email.matches("^([a-zA-Z0-9_\\.\\-+])+@[a-zA-Z0-9-.]+\\.[a-zA-Z0-9-]{2,}$")){
             Notification.show("Email is not correct!");
         } else if(phone.length() != 9){
