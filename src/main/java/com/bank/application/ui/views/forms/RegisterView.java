@@ -9,6 +9,7 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -61,7 +62,8 @@ public class RegisterView extends Composite {
                 new FormLayout.ResponsiveStep("32em", 2),
                 new FormLayout.ResponsiveStep("40em", 3));
 
-        VerticalLayout verticalLayout = new VerticalLayout(new H1("Join our bank"),
+        VerticalLayout verticalLayout = new VerticalLayout(
+                new H1("Join our bank"),
                 formLayout,
                 new Button("Sign up", e -> register(
                         username.getValue(),
@@ -94,7 +96,7 @@ public class RegisterView extends Composite {
             Notification.show("Enter a valid firstName");
         } else if(!lastName.matches("^[A-Z]([a-z])+$")) {
             Notification.show("Enter a valid lastName");
-        } else if(!address.matches("^[A-Z]([a-z]\\s?)+$")) {
+        } else if(address.isEmpty()) {
             Notification.show("Enter a valid address");
         } else if(!email.matches("^([a-zA-Z0-9_\\.\\-+])+@[a-zA-Z0-9-.]+\\.[a-zA-Z0-9-]{2,}$")){
             Notification.show("Email is not correct!");
