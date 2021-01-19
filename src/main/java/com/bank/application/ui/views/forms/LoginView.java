@@ -6,7 +6,11 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
@@ -28,7 +32,13 @@ public class LoginView extends Div {
         PasswordField password = new PasswordField("Password");
         password.setId("login-view-password");
 
+        VerticalLayout wrapper = new VerticalLayout();
+        wrapper.setAlignItems(FlexComponent.Alignment.CENTER);
+        Image imageBank = new Image("images/bank_logo.png", "Bank");
+        wrapper.add(imageBank);
+
         add(
+                wrapper,
                 new H1("Welcome"),
                 username,
                 password,
