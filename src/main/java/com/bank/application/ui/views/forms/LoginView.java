@@ -35,6 +35,7 @@ public class LoginView extends Div {
         VerticalLayout wrapper = new VerticalLayout();
         wrapper.setAlignItems(FlexComponent.Alignment.CENTER);
         Image imageBank = new Image("images/bank_logo.png", "Bank");
+        imageBank.setId("banklogo");
         wrapper.add(imageBank);
 
         add(
