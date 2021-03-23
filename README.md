@@ -1,6 +1,16 @@
 # BankAP
  Simple web bank application for studying purposes.
 
+## Screenshots
+<p align="left">
+  <img src="./img/img01.png" width="230">
+  <img src="./img/img02.png" width="230">
+  <img src="./img/img03.png" width="230">
+  <img src="./img/img04.png" width="230">
+  <img src="./img/img05.png" width="230">
+  <img src="./img/img06.png" width="230">
+</p>
+
 # Triggers
 ```sql
 SET GLOBAL log_bin_trust_function_creators = 1; with admin privileges firstly
